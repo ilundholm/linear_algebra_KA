@@ -8,9 +8,9 @@ _Living document tracking progress and next steps._
 
 | Unit | Articles | Exercises | Videos | Widgets |
 |------|----------|-----------|--------|---------|
-| 1. Systems of Linear Equations | 3/3 ✅ | Templates ✅ | 0 | 0 |
-| 2. Vectors and Linear Combinations | 0/3 | — | 0 | 0 |
-| 3. Matrix-Vector Multiplication | 0/3 | — | 0 | 0 |
+| 1. Systems of Linear Equations | 4/4 ✅ | Templates ✅ | 0 | 0 |
+| 2. Vectors and Linear Combinations | 3/3 ✅ | Templates ✅ | 0 | 0 |
+| 3. Matrix-Vector Multiplication & Transformations | 3/3 ✅ | Templates ✅ | 0 | 0 |
 | 4. Matrix Operations | 0/3 | — | 0 | 0 |
 | 5. Determinants | 0/3 | — | 0 | 0 |
 | 6. Eigenvalues and Eigenvectors | 0/3 | — | 0 | 0 |
@@ -23,68 +23,98 @@ _Living document tracking progress and next steps._
 
 ---
 
-## Unit 1 Detailed Status
+## Phase 1: Content Complete (Units 1-3) ✅
 
-### Articles
+- [x] Unit 1 articles (4 articles)
+- [x] Unit 2 articles (3 articles)
+- [x] Unit 3 articles (3 articles)
+- [x] Exercise templates for Units 1-3
 
-| Section | Status | Placeholders Needed |
-|---------|--------|---------------------|
-| 1.1 Introduction to Linear Systems | ✅ Draft complete | 2 videos, 1 widget, 3 images |
-| 1.2 Augmented Matrices and Row Reduction | ✅ Draft complete | 2 videos, 2 widgets, 1 flowchart |
-| 1.3 Interpreting Solutions | ✅ Draft complete | 1 video, 2 widgets, 1 flowchart |
-
-### Exercises
-
-| Exercise ID | Skill | Status |
-|-------------|-------|--------|
-| 1.1.1 | Check if point is solution | Template ✅ |
-| 1.1.2 | Count solutions (graphical) | Template ✅ |
-| 1.1.3 | Geometric interpretation | Template ✅ |
-| 1.2.1 | System → augmented matrix | Template ✅ |
-| 1.2.2 | Identify row operation | Template ✅ |
-| 1.2.3 | Perform row operation | Template ✅ |
-| 1.2.4 | Complete row reduction | Template ✅ |
-| 1.2.5 | Is this REF/RREF? | Template ✅ |
-| 1.3.1 | Identify pivot/free variables | Template ✅ |
-| 1.3.2 | Write parametric solution | Template ✅ |
-| 1.3.3 | Consistency check | Template ✅ |
-| 1.3.4 | Solution set dimension | Template ✅ |
-| 1.3.5 | Homogeneous systems | Template ✅ |
+**Total: 10 articles, 33 exercise types templated**
 
 ---
 
-## Visual Assets Needed
+## Phase 2: Make It Viewable (Next)
 
-### Short Videos (< 60s each)
-- [ ] Lines intersecting at a point (1.1)
-- [ ] 3D planes intersection demo (1.1)
-- [ ] Row reduction animation (1.2)
-- [ ] Full 3×3 row reduction walkthrough (1.2)
-- [ ] Parametric form as plane in 3D (1.3)
+- [ ] Set up GitHub Pages with MathJax
+- [ ] Basic navigation/index page
+- [ ] Static diagrams for key concepts
+- [ ] Update article cross-references
 
-### Interactive Widgets
-- [ ] Adjustable 2D system (shows lines moving, intersection updating)
-- [ ] System ↔ augmented matrix converter
-- [ ] Step-by-step row reduction tool
-- [ ] 3D plane configuration viewer
-- [ ] Homogeneous system explorer
+---
 
-### Static Images/Diagrams
-- [ ] Three cases diagram (one/none/infinite solutions)
-- [ ] Gaussian elimination flowchart
-- [ ] Existence/uniqueness decision tree
+## Phase 3: Make It Interactive
+
+- [ ] Research Perseus exercise format (KA's system)
+- [ ] Build or adapt exercise grading system
+- [ ] Create interactive widgets for:
+  - Vector addition visualizer
+  - Span explorer
+  - Transformation grid viewer
+  - Row reduction step-by-step tool
+
+---
+
+## Phase 4: Video Production
+
+- [ ] Test Manim installation
+- [ ] Create short clips (~30-60s) for article placeholders
+- [ ] Longer videos if needed
+
+---
+
+## Articles Completed
+
+### Unit 1: Systems of Linear Equations
+| Section | Title | Placeholders |
+|---------|-------|--------------|
+| 1.1 | Introduction to Linear Systems | 2 videos, 1 widget, 3 images |
+| 1.2 | Augmented Matrices and Row Reduction | 2 videos, 2 widgets, 1 flowchart |
+| 1.3 | Interpreting Solutions | 1 video, 2 widgets, 1 flowchart |
+| 1.4 | Applications | 2 videos, 2 widgets, 2 diagrams |
+
+### Unit 2: Vectors and Linear Combinations
+| Section | Title | Placeholders |
+|---------|-------|--------------|
+| 2.1 | Vectors in ℝⁿ | 2 videos, 2 widgets, 0 images |
+| 2.2 | Linear Combinations and Span | 1 video, 3 widgets, 1 image |
+| 2.3 | Linear Independence | 1 video, 1 widget, 1 image |
+
+### Unit 3: Matrix-Vector Multiplication & Transformations
+| Section | Title | Placeholders |
+|---------|-------|--------------|
+| 3.1 | Matrix-Vector Multiplication | 1 video, 0 widgets, 1 diagram |
+| 3.2 | Linear Transformations | 1 video, 2 widgets, 2 images |
+| 3.3 | The Matrix of a Transformation | 1 video, 2 widgets, 1 image |
+
+---
+
+## Exercise Templates Created
+
+| Unit | Exercise Count | Skills Covered |
+|------|---------------|----------------|
+| Unit 1 | 13 | Solution checking, RREF, parametric form, consistency |
+| Unit 2 | 13 | Vector operations, linear combinations, span, independence |
+| Unit 3 | 14 | Matrix-vector products, transformations, matrices from geometry |
+
+**Total: 40 exercise types**
+
+---
+
+## Decisions Made
+
+1. **Exercise platform:** Aim for Perseus-compatible JSON (full KA format)
+2. **Video scope:** Supplementary video moments for articles (tractable)
+3. **Hosting:** GitHub Pages
+4. **Demo artifact:** URL to GitHub Pages
 
 ---
 
 ## Open Questions
 
-1. **Exercise format:** How close to KA's Perseus format do we need to be? Should we eventually build JSON-compatible exercise specs?
-
-2. **Video production:** Use Manim for everything? License 3Blue1Brown clips? Record screen demos?
-
-3. **Khan Academy outreach:** When to contact them? After how much content is built?
-
-4. **Algorithmic generation:** Build actual Python scripts to generate exercise instances, or keep templates for now?
+1. **GitHub Pages setup:** Jekyll theme? Custom HTML? MathJax version?
+2. **Perseus research:** How much of the format is documented publicly?
+3. **Manim:** Is it installed? Can we render?
 
 ---
 
@@ -94,15 +124,21 @@ _Living document tracking progress and next steps._
 - Initial project setup
 - Syllabus completed (12 units)
 - Style guide written
-- Unit 1 articles drafted (all 3)
+- Unit 1 articles drafted (4 articles)
 - Unit 1 exercise templates created
-- README updated with project status
+- README and TRACKER created
+
+### 2026-02-03 (continued)
+- Unit 2 articles drafted (3 articles)
+- Unit 3 articles drafted (3 articles)
+- Exercise templates for Units 2 and 3 created
+- **Phase 1 complete!**
 
 ---
 
 ## Next Actions
 
-1. **Ian reviews Unit 1 articles** — gather feedback on tone, depth, coverage
-2. **Decide on first visual asset** — start with something small (static diagram?)
-3. **Draft Unit 2.1** — Vectors in ℝⁿ (after Unit 1 feedback incorporated)
-4. **Build one exercise generator** — proof of concept for algorithmic generation
+1. **Ian reviews Units 2 and 3 articles**
+2. **Set up GitHub Pages** (Phase 2)
+3. **Begin Perseus format research** (for Phase 3)
+4. **Test Manim** for video generation
