@@ -400,6 +400,277 @@ Explanation: Homogeneous systems always have the trivial solution. With more var
 
 ---
 
+## 1.4 Applications
+
+### Exercise 1.4.1: Curve Fitting Setup
+
+**Skill:** Write the system of equations for fitting a polynomial through points.
+
+**Parameters:**
+- `polynomial_degree`: 1 (linear) or 2 (quadratic)
+- `points`: 2 or 3 points with small integer coordinates
+
+**Generation Logic:**
+1. Generate points (ensuring they don't all lie on a simpler curve)
+2. Ask student to write one or more equations from the points
+
+**Example Instance:**
+```
+You want to fit a quadratic y = ax² + bx + c through the points (1, 4), (2, 9), and (3, 16).
+
+What equation does the point (2, 9) give you?
+
+(A) a + b + c = 4
+(B) 4a + 2b + c = 9
+(C) 9a + 3b + c = 16
+(D) 2a + 2b + c = 9
+
+Answer: (B)
+Explanation: Plug in x=2, y=9: a(2)² + b(2) + c = 9, so 4a + 2b + c = 9.
+```
+
+---
+
+### Exercise 1.4.2: Curve Fitting Solve
+
+**Skill:** Solve the system to find polynomial coefficients.
+
+**Parameters:**
+- `points`: 3 points with integer coordinates
+- `solution`: integer coefficients a, b, c
+
+**Generation Logic:**
+1. Start with a nice quadratic (small integer coefficients)
+2. Evaluate at x = 0, 1, 2 (or similar) to get points
+3. Student solves for coefficients
+
+**Example Instance:**
+```
+Fit a quadratic y = ax² + bx + c through (0, 1), (1, 2), (2, 5).
+
+The system is:
+  c = 1
+  a + b + c = 2
+  4a + 2b + c = 5
+
+What is a?
+
+(A) 0
+(B) 1
+(C) 2
+(D) -1
+
+Answer: (B)
+Explanation: From c = 1 and a + b + 1 = 2, we get a + b = 1.
+From 4a + 2b + 1 = 5, we get 4a + 2b = 4, so 2a + b = 2.
+Subtracting: a = 1.
+```
+
+---
+
+### Exercise 1.4.3: Chemical Equation - Write System
+
+**Skill:** Translate atom conservation into linear equations.
+
+**Parameters:**
+- `reaction`: simple reaction with 3-4 substances
+- `atoms`: 2-3 atom types
+
+**Generation Logic:**
+1. Choose a reaction (combustion, synthesis, etc.)
+2. Ask for the equation corresponding to one atom type
+
+**Example Instance:**
+```
+For the reaction: a·H₂ + b·O₂ → c·H₂O
+
+Write the equation for hydrogen (H) conservation.
+
+(A) 2a = 2c
+(B) a = c
+(C) 2a = c
+(D) a = 2c
+
+Answer: (A)
+Explanation: Left side has 2a hydrogens (each H₂ has 2). Right side has 2c hydrogens (each H₂O has 2).
+```
+
+---
+
+### Exercise 1.4.4: Chemical Equation - Solve
+
+**Skill:** Balance a chemical equation using linear algebra.
+
+**Parameters:**
+- `reaction`: simple reaction
+- `ask_for`: one of the coefficients
+
+**Example Instance:**
+```
+Balance: a·CH₄ + b·O₂ → c·CO₂ + d·H₂O
+
+The system (setting a = 1):
+  Carbon: 1 = c
+  Hydrogen: 4 = 2d
+  Oxygen: 2b = 2c + d
+
+What is b?
+
+(A) 1
+(B) 2
+(C) 3
+(D) 4
+
+Answer: (B)
+Explanation: c = 1, d = 2. Then 2b = 2(1) + 2 = 4, so b = 2.
+The balanced equation is CH₄ + 2O₂ → CO₂ + 2H₂O.
+```
+
+---
+
+### Exercise 1.4.5: Chemical Equation - Why Homogeneous?
+
+**Skill:** Understand why balancing gives a homogeneous system.
+
+**Example Instance:**
+```
+When setting up equations to balance a chemical reaction, the right-hand side is always zero. Why?
+
+(A) Because atoms are created in the reaction
+(B) Because atoms are destroyed in the reaction
+(C) Because atoms are neither created nor destroyed — only rearranged
+(D) Because we set one coefficient to 1
+
+Answer: (C)
+Explanation: Conservation of atoms means (atoms on left) - (atoms on right) = 0 for each atom type.
+```
+
+---
+
+### Exercise 1.4.6: Traffic Flow - Write Equation
+
+**Skill:** Write a conservation equation for a network node.
+
+**Parameters:**
+- `node_diagram`: simple intersection with labeled flows
+- `known_flows`: some external flows given
+- `unknown_flows`: internal flows as variables
+
+**Example Instance:**
+```
+At intersection B:
+- 300 cars/hour enter from the north
+- x₁ cars/hour arrive from intersection A
+- x₂ cars/hour leave toward intersection C
+
+Write the flow conservation equation for intersection B.
+
+(A) 300 + x₁ = x₂
+(B) 300 = x₁ + x₂
+(C) x₁ = 300 + x₂
+(D) 300 - x₁ - x₂ = 0
+
+Answer: (A)
+Explanation: Flow in = flow out. The flows in are 300 and x₁. The flow out is x₂.
+```
+
+---
+
+### Exercise 1.4.7: Traffic Flow - Interpret Solution
+
+**Skill:** Interpret the meaning of free variables in a network flow problem.
+
+**Parameters:**
+- `num_free_vars`: 1 or 2
+- `context`: what the free variable represents
+
+**Example Instance:**
+```
+A traffic network system has RREF:
+[1  0  -1  | 200]
+[0  1   1  | 500]
+
+With x₃ as a free variable, what does this mean for the network?
+
+(A) There's no valid traffic flow
+(B) There's exactly one valid traffic flow
+(C) There are infinitely many valid traffic flows
+(D) The network has an error
+
+Answer: (C)
+Explanation: The free variable means we can choose x₃ (within non-negativity constraints), and x₁, x₂ adjust accordingly. There's flexibility in how traffic distributes.
+```
+
+---
+
+### Exercise 1.4.8: Traffic Flow - Detect Inconsistency
+
+**Skill:** Recognize when flow data is inconsistent.
+
+**Example Instance:**
+```
+A network has: 400 cars/hour entering, 300 cars/hour exiting.
+After setting up the system, you get a row [0 0 0 | 100] in RREF.
+
+What does this mean?
+
+(A) The system has infinitely many solutions
+(B) The flow data is inconsistent — more cars enter than exit
+(C) x₃ = 100
+(D) The network is valid
+
+Answer: (B)
+Explanation: The row says 0 = 100, which is impossible. This means the given flow numbers are inconsistent — there's a 100 car/hour imbalance.
+```
+
+---
+
+### Exercise 1.4.9: Application Identification
+
+**Skill:** Recognize which application fits a given scenario.
+
+**Example Instance:**
+```
+You have three data points and want to find a parabola passing through all of them. This requires solving:
+
+(A) A homogeneous system
+(B) A 3×3 system with 3 unknowns
+(C) A system with free variables
+(D) An inconsistent system
+
+Answer: (B)
+Explanation: A quadratic has 3 coefficients (a, b, c). Each point gives one equation. Three points give a 3×3 system with a unique solution (assuming the points aren't collinear).
+```
+
+---
+
+### Exercise 1.4.10: Mixed Application
+
+**Skill:** Set up a system from a word problem context.
+
+**Parameters:**
+- `context`: curve fitting, chemistry, or network
+- `complexity`: 2 or 3 equations
+
+**Example Instance:**
+```
+A company ships products through two warehouses. 
+- Warehouse A receives 500 units and ships x₁ units to Store 1 and x₂ units to Store 2.
+- Store 1 needs 300 units total. Store 2 needs 200 units total.
+
+Which system represents this situation?
+
+(A) x₁ + x₂ = 500 and x₁ = 300 and x₂ = 200
+(B) x₁ = 300, x₂ = 200
+(C) x₁ + x₂ = 500, x₁ + x₂ = 500
+(D) 500 = x₁ = x₂
+
+Answer: (A)
+Explanation: All units from A are shipped (x₁ + x₂ = 500), and each store's demand must be met.
+```
+
+---
+
 ## Generation Notes
 
 ### For Future Implementation
