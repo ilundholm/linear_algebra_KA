@@ -162,44 +162,37 @@ view.grid({
 view.axis({ axis: 1, width: 3, color: '#ffffff' });
 view.axis({ axis: 2, width: 3, color: '#ffffff' });
 
-// Axis tick marks and labels
-view.scale({
-  axis: 1,
-  divide: 8,
+// X-axis labels
+view.array({
+  id: 'xlabels',
+  width: 5,
+  channels: 3,
+  data: [[-3, -0.3, 0], [-2, -0.3, 0], [-1, -0.3, 0], [1, -0.3, 0], [2, -0.3, 0], [3, -0.3, 0]],
 });
-view.ticks({
-  width: 2,
-  size: 10,
-  color: '#ffffff',
-});
-view.format({
-  digits: 0,
-  classes: ['tick-label'],
+view.text({
+  data: ['-3', '-2', '-1', '1', '2', '3'],
 });
 view.label({
+  points: '#xlabels',
   color: '#ffffff',
-  size: 14,
-  offset: [0, -20],
+  size: 12,
   depth: 0.5,
 });
 
-view.scale({
-  axis: 2,
-  divide: 8,
+// Y-axis labels  
+view.array({
+  id: 'ylabels',
+  width: 5,
+  channels: 3,
+  data: [[-0.3, -3, 0], [-0.3, -2, 0], [-0.3, -1, 0], [-0.3, 1, 0], [-0.3, 2, 0], [-0.3, 3, 0]],
 });
-view.ticks({
-  width: 2,
-  size: 10,
-  color: '#ffffff',
-});
-view.format({
-  digits: 0,
-  classes: ['tick-label'],
+view.text({
+  data: ['-3', '-2', '-1', '1', '2', '3'],
 });
 view.label({
+  points: '#ylabels',
   color: '#ffffff',
-  size: 14,
-  offset: [-20, 0],
+  size: 12,
   depth: 0.5,
 });
 
