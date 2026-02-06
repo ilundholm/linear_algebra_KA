@@ -158,9 +158,50 @@ view.grid({
   depth: 0.5,
 });
 
-// Axes
-view.axis({ axis: 1, width: 3, color: '#666' });
-view.axis({ axis: 2, width: 3, color: '#666' });
+// Axes (white)
+view.axis({ axis: 1, width: 3, color: '#ffffff' });
+view.axis({ axis: 2, width: 3, color: '#ffffff' });
+
+// Axis tick marks and labels
+view.scale({
+  axis: 1,
+  divide: 8,
+});
+view.ticks({
+  width: 2,
+  size: 10,
+  color: '#ffffff',
+});
+view.format({
+  digits: 0,
+  classes: ['tick-label'],
+});
+view.label({
+  color: '#ffffff',
+  size: 14,
+  offset: [0, -20],
+  depth: 0.5,
+});
+
+view.scale({
+  axis: 2,
+  divide: 8,
+});
+view.ticks({
+  width: 2,
+  size: 10,
+  color: '#ffffff',
+});
+view.format({
+  digits: 0,
+  classes: ['tick-label'],
+});
+view.label({
+  color: '#ffffff',
+  size: 14,
+  offset: [-20, 0],
+  depth: 0.5,
+});
 
 // Vector v1 (red)
 view.array({
