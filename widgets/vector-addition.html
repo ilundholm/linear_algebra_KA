@@ -1,0 +1,369 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Vector Addition</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/mathbox@2.3.1/build/mathbox.css">
+  <style>
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      background: #1a1a2e;
+      font-family: 'Segoe UI', sans-serif;
+      color: #eee;
+    }
+    #mathbox {
+      width: 100%;
+      height: 70vh;
+      min-height: 400px;
+    }
+    .controls {
+      padding: 15px 20px;
+      text-align: center;
+      background: #12121c;
+    }
+    .controls label {
+      margin: 0 10px;
+    }
+    .controls input[type="range"] {
+      width: 100px;
+      vertical-align: middle;
+    }
+    .vector-label {
+      display: inline-block;
+      padding: 4px 12px;
+      border-radius: 4px;
+      margin: 0 5px;
+      font-weight: bold;
+    }
+    .v1 { background: #e94560; }
+    .v2 { background: #4d80e4; }
+    .sum { background: #16c79a; }
+    
+    .info-panel {
+      position: absolute;
+      top: 20px;
+      left: 20px;
+      background: rgba(0,0,0,0.8);
+      padding: 15px 20px;
+      border-radius: 8px;
+      font-size: 18px;
+      line-height: 1.4;
+      display: flex;
+      gap: 25px;
+    }
+    .info-panel .vector-display {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .info-panel .v1-text { color: #e94560; }
+    .info-panel .v2-text { color: #4d80e4; }
+    .info-panel .sum-text { color: #16c79a; }
+    
+    .col-vector {
+      display: inline-flex;
+      flex-direction: column;
+      align-items: center;
+      border-left: 2px solid currentColor;
+      border-right: 2px solid currentColor;
+      padding: 2px 8px;
+      margin-left: 4px;
+      border-radius: 3px;
+    }
+    .col-vector span {
+      line-height: 1.3;
+    }
+    
+    .mode-toggle {
+      margin-left: 30px;
+      background: #2a2a4a;
+      border: none;
+      color: #fff;
+      padding: 8px 16px;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 14px;
+    }
+    .mode-toggle:hover {
+      background: #3a3a5a;
+    }
+  </style>
+</head>
+<body>
+
+<div id="mathbox"></div>
+
+<div class="info-panel">
+  <div class="vector-display v1-text">
+    <strong>v₁</strong> = 
+    <div class="col-vector"><span id="v1x-display">2.0</span><span id="v1y-display">1.0</span></div>
+  </div>
+  <div class="vector-display v2-text">
+    <strong>v₂</strong> = 
+    <div class="col-vector"><span id="v2x-display">1.0</span><span id="v2y-display">2.0</span></div>
+  </div>
+  <div class="vector-display sum-text">
+    <strong>v₁+v₂</strong> = 
+    <div class="col-vector"><span id="sumx-display">3.0</span><span id="sumy-display">3.0</span></div>
+  </div>
+</div>
+
+<div class="controls">
+  <span class="vector-label v1">v₁</span>
+  <label>x: <input type="range" id="v1x" min="-3" max="3" step="0.1" value="2"></label>
+  <label>y: <input type="range" id="v1y" min="-3" max="3" step="0.1" value="1"></label>
+  
+  <span style="margin: 0 15px; color: #666;">|</span>
+  
+  <span class="vector-label v2">v₂</span>
+  <label>x: <input type="range" id="v2x" min="-3" max="3" step="0.1" value="1"></label>
+  <label>y: <input type="range" id="v2y" min="-3" max="3" step="0.1" value="2"></label>
+  
+  <button class="mode-toggle" id="modeToggle">Mode: Tip-to-Tail</button>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/three@0.137.0/build/three.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/three@0.137.0/examples/js/controls/OrbitControls.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/mathbox@2.3.1/build/bundle/mathbox.js"></script>
+
+<script>
+// State
+let v1 = [2, 1, 0];
+let v2 = [1, 2, 0];
+let mode = 'tip-to-tail'; // or 'parallelogram'
+
+function fmt(n) {
+  return Number(n).toFixed(1);
+}
+
+// Initialize MathBox
+const mathbox = MathBox.mathBox({
+  element: document.getElementById('mathbox'),
+  plugins: ['core', 'controls', 'cursor'],
+  controls: {
+    klass: THREE.OrbitControls,
+  },
+  camera: {
+    fov: 45,
+  },
+});
+
+mathbox.three.renderer.setClearColor(new THREE.Color('#1a1a2e'), 1.0);
+
+mathbox.camera({
+  proxy: true,
+  position: [0, 0, 6],
+});
+
+const view = mathbox
+  .cartesian({
+    range: [[-4, 4], [-4, 4], [-1, 1]],
+    scale: [2, 2, 1],
+  });
+
+// Grid
+view.grid({
+  axes: [1, 2],
+  width: 1,
+  color: '#444',
+  depth: 0.5,
+});
+
+// Axes (white)
+view.axis({ axis: 1, width: 3, color: '#ffffff' });
+view.axis({ axis: 2, width: 3, color: '#ffffff' });
+
+// X-axis labels
+view.array({
+  id: 'xlabels',
+  width: 6,
+  channels: 3,
+  data: [[-3, -0.4, 0], [-2, -0.4, 0], [-1, -0.4, 0], [1, -0.4, 0], [2, -0.4, 0], [3, -0.4, 0]],
+});
+view.text({
+  data: ['-3', '-2', '-1', '1', '2', '3'],
+});
+view.label({
+  points: '#xlabels',
+  color: '#aaaaaa',
+  size: 20,
+  depth: 0.5,
+});
+
+// Y-axis labels  
+view.array({
+  id: 'ylabels',
+  width: 6,
+  channels: 3,
+  data: [[-0.4, -3, 0], [-0.4, -2, 0], [-0.4, -1, 0], [-0.4, 1, 0], [-0.4, 2, 0], [-0.4, 3, 0]],
+});
+view.text({
+  data: ['-3', '-2', '-1', '1', '2', '3'],
+});
+view.label({
+  points: '#ylabels',
+  color: '#aaaaaa',
+  size: 20,
+  depth: 0.5,
+});
+
+// Vector v1 (red)
+view.array({
+  id: 'v1points',
+  width: 2,
+  channels: 3,
+  data: [[0, 0, 0], v1],
+});
+view.line({
+  points: '#v1points',
+  color: '#e94560',
+  width: 8,
+});
+view.array({
+  id: 'v1tip',
+  width: 1,
+  channels: 3,
+  data: [v1],
+});
+view.point({
+  points: '#v1tip',
+  color: '#e94560',
+  size: 20,
+});
+
+// Vector v2 (blue)
+view.array({
+  id: 'v2points',
+  width: 2,
+  channels: 3,
+  data: [[0, 0, 0], v2],
+});
+view.line({
+  points: '#v2points',
+  color: '#4d80e4',
+  width: 8,
+});
+view.array({
+  id: 'v2tip',
+  width: 1,
+  channels: 3,
+  data: [v2],
+});
+view.point({
+  points: '#v2tip',
+  color: '#4d80e4',
+  size: 20,
+});
+
+// Ghost vector for tip-to-tail or parallelogram
+// In tip-to-tail: v2 starts at tip of v1
+// In parallelogram: v1 starts at tip of v2 (shows the parallelogram)
+view.array({
+  id: 'ghost1points',
+  width: 2,
+  channels: 3,
+  data: [v1, [v1[0] + v2[0], v1[1] + v2[1], 0]],
+});
+view.line({
+  id: 'ghost1line',
+  points: '#ghost1points',
+  color: '#4d80e4',
+  width: 5,
+  opacity: 0.4,
+});
+
+view.array({
+  id: 'ghost2points',
+  width: 2,
+  channels: 3,
+  data: [v2, [v1[0] + v2[0], v1[1] + v2[1], 0]],
+});
+view.line({
+  id: 'ghost2line',
+  points: '#ghost2points',
+  color: '#e94560',
+  width: 5,
+  opacity: 0,
+});
+
+// Sum vector (green)
+let sum = [v1[0] + v2[0], v1[1] + v2[1], 0];
+view.array({
+  id: 'sumpoints',
+  width: 2,
+  channels: 3,
+  data: [[0, 0, 0], sum],
+});
+view.line({
+  points: '#sumpoints',
+  color: '#16c79a',
+  width: 8,
+});
+view.array({
+  id: 'sumtip',
+  width: 1,
+  channels: 3,
+  data: [sum],
+});
+view.point({
+  points: '#sumtip',
+  color: '#16c79a',
+  size: 20,
+});
+
+function updateVectors() {
+  v1 = [parseFloat(document.getElementById('v1x').value), 
+        parseFloat(document.getElementById('v1y').value),
+        0];
+  v2 = [parseFloat(document.getElementById('v2x').value), 
+        parseFloat(document.getElementById('v2y').value),
+        0];
+  
+  sum = [v1[0] + v2[0], v1[1] + v2[1], 0];
+  
+  mathbox.select('#v1points').set('data', [[0, 0, 0], v1]);
+  mathbox.select('#v1tip').set('data', [v1]);
+  
+  mathbox.select('#v2points').set('data', [[0, 0, 0], v2]);
+  mathbox.select('#v2tip').set('data', [v2]);
+  
+  mathbox.select('#ghost1points').set('data', [v1, sum]);
+  mathbox.select('#ghost2points').set('data', [v2, sum]);
+  
+  mathbox.select('#sumpoints').set('data', [[0, 0, 0], sum]);
+  mathbox.select('#sumtip').set('data', [sum]);
+  
+  // Update info panel
+  document.getElementById('v1x-display').textContent = fmt(v1[0]);
+  document.getElementById('v1y-display').textContent = fmt(v1[1]);
+  document.getElementById('v2x-display').textContent = fmt(v2[0]);
+  document.getElementById('v2y-display').textContent = fmt(v2[1]);
+  document.getElementById('sumx-display').textContent = fmt(sum[0]);
+  document.getElementById('sumy-display').textContent = fmt(sum[1]);
+}
+
+function toggleMode() {
+  if (mode === 'tip-to-tail') {
+    mode = 'parallelogram';
+    document.getElementById('modeToggle').textContent = 'Mode: Parallelogram';
+    mathbox.select('#ghost1line').set('opacity', 0.4);
+    mathbox.select('#ghost2line').set('opacity', 0.4);
+  } else {
+    mode = 'tip-to-tail';
+    document.getElementById('modeToggle').textContent = 'Mode: Tip-to-Tail';
+    mathbox.select('#ghost1line').set('opacity', 0.4);
+    mathbox.select('#ghost2line').set('opacity', 0);
+  }
+}
+
+document.querySelectorAll('input[type="range"]').forEach(input => {
+  input.addEventListener('input', updateVectors);
+});
+
+document.getElementById('modeToggle').addEventListener('click', toggleMode);
+</script>
+
+</body>
+</html>
