@@ -46,11 +46,32 @@
       padding: 15px 20px;
       border-radius: 8px;
       font-size: 16px;
-      line-height: 1.8;
+      line-height: 1.4;
+      display: flex;
+      gap: 25px;
+    }
+    .info-panel .vector-display {
+      display: flex;
+      align-items: center;
+      gap: 8px;
     }
     .info-panel .v1-text { color: #e94560; }
     .info-panel .v2-text { color: #4d80e4; }
     .info-panel .sum-text { color: #16c79a; }
+    
+    .col-vector {
+      display: inline-flex;
+      flex-direction: column;
+      align-items: center;
+      border-left: 2px solid currentColor;
+      border-right: 2px solid currentColor;
+      padding: 2px 6px;
+      margin-left: 4px;
+      border-radius: 3px;
+    }
+    .col-vector span {
+      line-height: 1.3;
+    }
   </style>
 </head>
 <body>
@@ -58,9 +79,18 @@
 <div id="mathbox"></div>
 
 <div class="info-panel">
-  <div><span class="v1-text"><strong>v₁</strong> = (<span id="v1display">2.0, 1.0</span>)</span></div>
-  <div><span class="v2-text"><strong>v₂</strong> = (<span id="v2display">1.0, 2.0</span>)</span></div>
-  <div><span class="sum-text"><strong>v₁ + v₂</strong> = (<span id="sumdisplay">3.0, 3.0</span>)</span></div>
+  <div class="vector-display v1-text">
+    <strong>v₁</strong> = 
+    <div class="col-vector"><span id="v1x-display">2.0</span><span id="v1y-display">1.0</span></div>
+  </div>
+  <div class="vector-display v2-text">
+    <strong>v₂</strong> = 
+    <div class="col-vector"><span id="v2x-display">1.0</span><span id="v2y-display">2.0</span></div>
+  </div>
+  <div class="vector-display sum-text">
+    <strong>v₁+v₂</strong> = 
+    <div class="col-vector"><span id="sumx-display">3.0</span><span id="sumy-display">3.0</span></div>
+  </div>
 </div>
 
 <div class="controls">
@@ -243,9 +273,12 @@ function updateVectors() {
   mathbox.select('#sumtip').set('data', [sum]);
   
   // Update info panel
-  document.getElementById('v1display').textContent = `${fmt(v1[0])}, ${fmt(v1[1])}`;
-  document.getElementById('v2display').textContent = `${fmt(v2[0])}, ${fmt(v2[1])}`;
-  document.getElementById('sumdisplay').textContent = `${fmt(sum[0])}, ${fmt(sum[1])}`;
+  document.getElementById('v1x-display').textContent = fmt(v1[0]);
+  document.getElementById('v1y-display').textContent = fmt(v1[1]);
+  document.getElementById('v2x-display').textContent = fmt(v2[0]);
+  document.getElementById('v2y-display').textContent = fmt(v2[1]);
+  document.getElementById('sumx-display').textContent = fmt(sum[0]);
+  document.getElementById('sumy-display').textContent = fmt(sum[1]);
 }
 
 // Attach listeners
