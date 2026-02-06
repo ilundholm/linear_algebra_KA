@@ -38,27 +38,27 @@ _Manim stills — professional geometric illustrations._
 
 ## Interactive Widgets (15)
 
-_Candidates: GeoGebra, custom JS (D3/Three.js), or embedded Manim WebGL._
+_Built with MathBox.js for consistent aesthetic with Manim videos._
 
-| Article | Line | Description |
-|---------|------|-------------|
-| 1.1 | 91 | Two sliders controlling slopes; shows intersection point updating |
-| 1.1 | 233 | 3D widget: Three planes intersecting (drag to rotate) |
-| 1.2 | 63 | Side-by-side: System of equations ↔ Augmented matrix (editable, synced) |
-| 1.2 | 313 | Step-by-step row reduction tool (user clicks operations) |
-| 1.3 | 204 | Parametric solution explorer: slider for t, shows point moving along solution line/plane |
-| 1.4 | 24 | Simple circuit or network with adjustable flows |
-| 1.4 | 280 | Leontief input-output model explorer |
-| 2.1 | 20 | Click to place vectors, see coordinates update |
-| 2.1 | 87 | Two draggable vectors; sum shown as third vector (tip-to-tail / parallelogram toggle) |
-| 2.2 | 68 | Two fixed vectors (standard basis), sliders for c₁ and c₂, resulting linear combination drawn |
-| 2.2 | 129 | Two vectors, adjust coefficients, tip reaches anywhere in plane |
-| 2.2 | 261 | Three vectors in 2D, sliders for x₁, x₂, x₃; shows linear combination reaching target [4,7]; second mode shows "zero combination" |
-| 2.3 | 261 | Vectors in 2D/3D; toggle to show dependence (one as sum of others) |
-| 3.2 | 59 | Grid of points; apply matrix transformation; watch grid deform |
-| 3.2 | 297 | Transformation explorer: pick from common matrices (rotation, shear, etc.), see effect |
-| 3.3 | 68 | Click to define where basis vectors go; matrix updates automatically |
-| 3.3 | 201 | Composition explorer: apply two transformations in sequence, see combined matrix |
+| Article | Line | Description | Status |
+|---------|------|-------------|--------|
+| 1.1 | 91 | Two sliders controlling slopes; shows intersection point updating | |
+| 1.1 | 233 | 3D widget: Three planes intersecting (drag to rotate) | |
+| 1.2 | 63 | Side-by-side: System of equations ↔ Augmented matrix (editable, synced) | |
+| 1.2 | 313 | Step-by-step row reduction tool (user clicks operations) | |
+| 1.3 | 204 | Parametric solution explorer: slider for t, shows point moving along solution line/plane | |
+| 1.4 | 24 | Simple circuit or network with adjustable flows | |
+| 1.4 | 280 | Leontief input-output model explorer | |
+| 2.1 | 20 | Click to place vectors, see coordinates update | |
+| 2.1 | 87 | Vector addition with parallelogram visualization | ✅ Done |
+| 2.2 | 68 | Two fixed vectors (standard basis), sliders for c₁ and c₂, resulting linear combination drawn | |
+| 2.2 | 129 | Two vectors, adjust coefficients, tip reaches anywhere in plane | |
+| 2.2 | 261 | Three vectors in 2D, sliders for x₁, x₂, x₃; shows linear combination reaching target [4,7]; second mode shows "zero combination" | |
+| 2.3 | 261 | Vectors in 2D/3D; toggle to show dependence (one as sum of others) | |
+| 3.2 | 59 | Grid of points; apply matrix transformation; watch grid deform | |
+| 3.2 | 297 | Transformation explorer: pick from common matrices (rotation, shear, etc.), see effect | |
+| 3.3 | 68 | Click to define where basis vectors go; matrix updates automatically | |
+| 3.3 | 201 | Composition explorer: apply two transformations in sequence, see combined matrix | |
 
 ---
 
