@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Vector Addition - MathBox Demo</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/mathbox@2.3.1/build/mathbox.css">
+  <style>
+    body {
+      margin: 0;
+      background: #1a1a2e;
+      font-family: 'Segoe UI', sans-serif;
+      color: #eee;
+    }
+    #mathbox {
+      width: 100vw;
+      height: 80vh;
+    }
+    .controls {
+      padding: 20px;
+      text-align: center;
+    }
+    .controls label {
+      margin: 0 15px;
+    }
+    .controls input[type="range"] {
+      width: 120px;
+      vertical-align: middle;
+    }
+    .vector-label {
+      display: inline-block;
+      padding: 4px 12px;
+      border-radius: 4px;
+      margin: 0 5px;
+      font-weight: bold;
+    }
+    .v1 { background: #e94560; }
+    .v2 { background: #0f3460; }
+    .sum { background: #16c79a; }
+  </style>
+</head>
+<body>
+
+<div id="mathbox"></div>
+
+<div class="controls">
+  <span class="vector-label v1">v₁</span>
+  <label>x₁: <input type="range" id="v1x" min="-3" max="3" step="0.1" value="2"></label>
+  <label>y₁: <input type="range" id="v1y" min="-3" max="3" step="0.1" value="1"></label>
+  
+  <span style="margin: 0 20px;">|</span>
+  
+  <span class="vector-label v2">v₂</span>
+  <label>x₂: <input type="range" id="v2x" min="-3" max="3" step="0.1" value="1"></label>
+  <label>y₂: <input type="range" id="v2y" min="-3" max="3" step="0.1" value="2"></label>
+  
+  <span style="margin: 0 20px;">|</span>
+  
+  <span class="vector-label sum">v₁ + v₂</span>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/three@0.137.0/build/three.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/three@0.137.0/examples/js/controls/OrbitControls.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/mathbox@2.3.1/build/bundle/mathbox.js"></script>
+
+<script>
+// Vector state
+let v1 = [2, 1];
+let v2 = [1, 2];
+
+// Initialize MathBox
+const mathbox = MathBox.mathBox({
+  element: document.getElementById('mathbox'),
+  plugins: ['core', 'controls', 'cursor'],
+  controls: {
+    klass: THREE.OrbitControls,
+  },
+  camera: {
+    fov: 45,
+  },
+});
+
+// Set up 2D view (looking down z-axis)
+mathbox.camera({
+  proxy: true,
+  position: [0, 0, 5],
+});
+
+mathbox.set('focus', 3);
+
+const view = mathbox
+  .cartesian({
+    range: [[-4, 4], [-4, 4]],
+    scale: [2, 2],
+  });
+
+// Grid
+view.grid({
+  axes: [1, 2],
+  width: 1,
+  color: '#333',
+  depth: 0.5,
+});
+
+// Axes
+view.axis({ axis: 1, width: 2, color: '#666' });
+view.axis({ axis: 2, width: 2, color: '#666' });
+
+// Vector v1 (red)
+view.array({
+  id: 'v1data',
+  width: 2,
+  channels: 2,
+  data: [[0, 0], v1],
+});
+view.vector({
+  points: '#v1data',
+  color: '#e94560',
+  width: 6,
+  end: true,
+});
+
+// Vector v2 (blue)
+view.array({
+  id: 'v2data',
+  width: 2,
+  channels: 2,
+  data: [[0, 0], v2],
+});
+view.vector({
+  points: '#v2data',
+  color: '#4d80e4',
+  width: 6,
+  end: true,
+});
+
+// Vector v2 translated (tip-to-tail, dashed appearance via opacity)
+view.array({
+  id: 'v2translated',
+  width: 2,
+  channels: 2,
+  data: [v1, [v1[0] + v2[0], v1[1] + v2[1]]],
+});
+view.vector({
+  points: '#v2translated',
+  color: '#4d80e4',
+  width: 4,
+  end: true,
+  opacity: 0.5,
+});
+
+// Sum vector (green)
+view.array({
+  id: 'sumdata',
+  width: 2,
+  channels: 2,
+  data: [[0, 0], [v1[0] + v2[0], v1[1] + v2[1]]],
+});
+view.vector({
+  points: '#sumdata',
+  color: '#16c79a',
+  width: 6,
+  end: true,
+});
+
+// Update function
+function updateVectors() {
+  v1 = [parseFloat(document.getElementById('v1x').value), 
+        parseFloat(document.getElementById('v1y').value)];
+  v2 = [parseFloat(document.getElementById('v2x').value), 
+        parseFloat(document.getElementById('v2y').value)];
+  
+  const sum = [v1[0] + v2[0], v1[1] + v2[1]];
+  
+  mathbox.select('#v1data').set('data', [[0, 0], v1]);
+  mathbox.select('#v2data').set('data', [[0, 0], v2]);
+  mathbox.select('#v2translated').set('data', [v1, sum]);
+  mathbox.select('#sumdata').set('data', [[0, 0], sum]);
+}
+
+// Attach listeners
+document.querySelectorAll('input[type="range"]').forEach(input => {
+  input.addEventListener('input', updateVectors);
+});
+</script>
+
+</body>
+</html>
