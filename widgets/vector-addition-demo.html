@@ -35,7 +35,7 @@
       font-weight: bold;
     }
     .v1 { background: #e94560; }
-    .v2 { background: #0f3460; }
+    .v2 { background: #4d80e4; }
     .sum { background: #16c79a; }
   </style>
 </head>
@@ -65,8 +65,8 @@
 
 <script>
 // Vector state
-let v1 = [2, 1];
-let v2 = [1, 2];
+let v1 = [2, 1, 0];
+let v2 = [1, 2, 0];
 
 // Initialize MathBox
 const mathbox = MathBox.mathBox({
@@ -80,102 +80,143 @@ const mathbox = MathBox.mathBox({
   },
 });
 
-// Set up 2D view (looking down z-axis)
+// Set background color
+mathbox.three.renderer.setClearColor(new THREE.Color('#1a1a2e'), 1.0);
+
+// Set up camera for 2D view
 mathbox.camera({
   proxy: true,
-  position: [0, 0, 5],
+  position: [0, 0, 6],
 });
-
-mathbox.set('focus', 3);
 
 const view = mathbox
   .cartesian({
-    range: [[-4, 4], [-4, 4]],
-    scale: [2, 2],
+    range: [[-4, 4], [-4, 4], [-1, 1]],
+    scale: [2, 2, 1],
   });
 
 // Grid
 view.grid({
   axes: [1, 2],
   width: 1,
-  color: '#333',
+  color: '#444',
   depth: 0.5,
 });
 
 // Axes
-view.axis({ axis: 1, width: 2, color: '#666' });
-view.axis({ axis: 2, width: 2, color: '#666' });
+view.axis({ axis: 1, width: 3, color: '#666' });
+view.axis({ axis: 2, width: 3, color: '#666' });
 
-// Vector v1 (red)
+// Vector v1 (red) - using line primitive
 view.array({
-  id: 'v1data',
+  id: 'v1points',
   width: 2,
-  channels: 2,
-  data: [[0, 0], v1],
+  channels: 3,
+  data: [[0, 0, 0], v1],
 });
-view.vector({
-  points: '#v1data',
+view.line({
+  points: '#v1points',
   color: '#e94560',
-  width: 6,
-  end: true,
+  width: 8,
+  stroke: 'solid',
+});
+// Arrowhead for v1
+view.array({
+  id: 'v1tip',
+  width: 1,
+  channels: 3,
+  data: [v1],
+});
+view.point({
+  points: '#v1tip',
+  color: '#e94560',
+  size: 20,
 });
 
 // Vector v2 (blue)
 view.array({
-  id: 'v2data',
+  id: 'v2points',
   width: 2,
-  channels: 2,
-  data: [[0, 0], v2],
+  channels: 3,
+  data: [[0, 0, 0], v2],
 });
-view.vector({
-  points: '#v2data',
+view.line({
+  points: '#v2points',
   color: '#4d80e4',
-  width: 6,
-  end: true,
+  width: 8,
+});
+view.array({
+  id: 'v2tip',
+  width: 1,
+  channels: 3,
+  data: [v2],
+});
+view.point({
+  points: '#v2tip',
+  color: '#4d80e4',
+  size: 20,
 });
 
-// Vector v2 translated (tip-to-tail, dashed appearance via opacity)
+// Vector v2 translated (tip-to-tail)
 view.array({
-  id: 'v2translated',
+  id: 'v2transpoints',
   width: 2,
-  channels: 2,
-  data: [v1, [v1[0] + v2[0], v1[1] + v2[1]]],
+  channels: 3,
+  data: [v1, [v1[0] + v2[0], v1[1] + v2[1], 0]],
 });
-view.vector({
-  points: '#v2translated',
+view.line({
+  points: '#v2transpoints',
   color: '#4d80e4',
-  width: 4,
-  end: true,
-  opacity: 0.5,
+  width: 5,
+  opacity: 0.4,
 });
 
 // Sum vector (green)
+const sum = [v1[0] + v2[0], v1[1] + v2[1], 0];
 view.array({
-  id: 'sumdata',
+  id: 'sumpoints',
   width: 2,
-  channels: 2,
-  data: [[0, 0], [v1[0] + v2[0], v1[1] + v2[1]]],
+  channels: 3,
+  data: [[0, 0, 0], sum],
 });
-view.vector({
-  points: '#sumdata',
+view.line({
+  points: '#sumpoints',
   color: '#16c79a',
-  width: 6,
-  end: true,
+  width: 8,
+});
+view.array({
+  id: 'sumtip',
+  width: 1,
+  channels: 3,
+  data: [sum],
+});
+view.point({
+  points: '#sumtip',
+  color: '#16c79a',
+  size: 20,
 });
 
 // Update function
 function updateVectors() {
   v1 = [parseFloat(document.getElementById('v1x').value), 
-        parseFloat(document.getElementById('v1y').value)];
+        parseFloat(document.getElementById('v1y').value),
+        0];
   v2 = [parseFloat(document.getElementById('v2x').value), 
-        parseFloat(document.getElementById('v2y').value)];
+        parseFloat(document.getElementById('v2y').value),
+        0];
   
-  const sum = [v1[0] + v2[0], v1[1] + v2[1]];
+  const sum = [v1[0] + v2[0], v1[1] + v2[1], 0];
   
-  mathbox.select('#v1data').set('data', [[0, 0], v1]);
-  mathbox.select('#v2data').set('data', [[0, 0], v2]);
-  mathbox.select('#v2translated').set('data', [v1, sum]);
-  mathbox.select('#sumdata').set('data', [[0, 0], sum]);
+  mathbox.select('#v1points').set('data', [[0, 0, 0], v1]);
+  mathbox.select('#v1tip').set('data', [v1]);
+  
+  mathbox.select('#v2points').set('data', [[0, 0, 0], v2]);
+  mathbox.select('#v2tip').set('data', [v2]);
+  
+  mathbox.select('#v2transpoints').set('data', [v1, sum]);
+  
+  mathbox.select('#sumpoints').set('data', [[0, 0, 0], sum]);
+  mathbox.select('#sumtip').set('data', [sum]);
 }
 
 // Attach listeners
