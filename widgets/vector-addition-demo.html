@@ -37,6 +37,28 @@
     .v1 { background: #e94560; }
     .v2 { background: #4d80e4; }
     .sum { background: #16c79a; }
+    
+    /* MathBox label styling */
+    .mathbox-label {
+      font-family: 'Segoe UI', sans-serif;
+      font-size: 14px;
+      font-weight: bold;
+      padding: 4px 8px;
+      border-radius: 4px;
+      white-space: nowrap;
+    }
+    .label-v1 {
+      background: rgba(233, 69, 96, 0.9);
+      color: white;
+    }
+    .label-v2 {
+      background: rgba(77, 128, 228, 0.9);
+      color: white;
+    }
+    .label-sum {
+      background: rgba(22, 199, 154, 0.9);
+      color: white;
+    }
   </style>
 </head>
 <body>
@@ -67,6 +89,11 @@
 // Vector state
 let v1 = [2, 1, 0];
 let v2 = [1, 2, 0];
+
+// Format number for display
+function fmt(n) {
+  return Number(n).toFixed(1);
+}
 
 // Initialize MathBox
 const mathbox = MathBox.mathBox({
@@ -107,7 +134,7 @@ view.grid({
 view.axis({ axis: 1, width: 3, color: '#666' });
 view.axis({ axis: 2, width: 3, color: '#666' });
 
-// Vector v1 (red) - using line primitive
+// Vector v1 (red)
 view.array({
   id: 'v1points',
   width: 2,
@@ -118,9 +145,7 @@ view.line({
   points: '#v1points',
   color: '#e94560',
   width: 8,
-  stroke: 'solid',
 });
-// Arrowhead for v1
 view.array({
   id: 'v1tip',
   width: 1,
@@ -131,6 +156,21 @@ view.point({
   points: '#v1tip',
   color: '#e94560',
   size: 20,
+});
+
+// Label for v1
+view.array({
+  id: 'v1labelpos',
+  width: 1,
+  channels: 3,
+  data: [[v1[0] + 0.3, v1[1] + 0.3, 0]],
+});
+view.html({
+  points: '#v1labelpos',
+  id: 'v1label',
+  html: `<div class="mathbox-label label-v1">v₁ = (${fmt(v1[0])}, ${fmt(v1[1])})</div>`,
+  size: 16,
+  depth: 0,
 });
 
 // Vector v2 (blue)
@@ -157,6 +197,21 @@ view.point({
   size: 20,
 });
 
+// Label for v2
+view.array({
+  id: 'v2labelpos',
+  width: 1,
+  channels: 3,
+  data: [[v2[0] + 0.3, v2[1] + 0.3, 0]],
+});
+view.html({
+  points: '#v2labelpos',
+  id: 'v2label',
+  html: `<div class="mathbox-label label-v2">v₂ = (${fmt(v2[0])}, ${fmt(v2[1])})</div>`,
+  size: 16,
+  depth: 0,
+});
+
 // Vector v2 translated (tip-to-tail)
 view.array({
   id: 'v2transpoints',
@@ -172,7 +227,7 @@ view.line({
 });
 
 // Sum vector (green)
-const sum = [v1[0] + v2[0], v1[1] + v2[1], 0];
+let sum = [v1[0] + v2[0], v1[1] + v2[1], 0];
 view.array({
   id: 'sumpoints',
   width: 2,
@@ -196,6 +251,21 @@ view.point({
   size: 20,
 });
 
+// Label for sum
+view.array({
+  id: 'sumlabelpos',
+  width: 1,
+  channels: 3,
+  data: [[sum[0] + 0.3, sum[1] - 0.3, 0]],
+});
+view.html({
+  points: '#sumlabelpos',
+  id: 'sumlabel',
+  html: `<div class="mathbox-label label-sum">v₁+v₂ = (${fmt(sum[0])}, ${fmt(sum[1])})</div>`,
+  size: 16,
+  depth: 0,
+});
+
 // Update function
 function updateVectors() {
   v1 = [parseFloat(document.getElementById('v1x').value), 
@@ -205,8 +275,9 @@ function updateVectors() {
         parseFloat(document.getElementById('v2y').value),
         0];
   
-  const sum = [v1[0] + v2[0], v1[1] + v2[1], 0];
+  sum = [v1[0] + v2[0], v1[1] + v2[1], 0];
   
+  // Update vector lines
   mathbox.select('#v1points').set('data', [[0, 0, 0], v1]);
   mathbox.select('#v1tip').set('data', [v1]);
   
@@ -217,6 +288,16 @@ function updateVectors() {
   
   mathbox.select('#sumpoints').set('data', [[0, 0, 0], sum]);
   mathbox.select('#sumtip').set('data', [sum]);
+  
+  // Update label positions
+  mathbox.select('#v1labelpos').set('data', [[v1[0] + 0.3, v1[1] + 0.3, 0]]);
+  mathbox.select('#v2labelpos').set('data', [[v2[0] + 0.3, v2[1] + 0.3, 0]]);
+  mathbox.select('#sumlabelpos').set('data', [[sum[0] + 0.3, sum[1] - 0.3, 0]]);
+  
+  // Update label text
+  mathbox.select('#v1label').set('html', `<div class="mathbox-label label-v1">v₁ = (${fmt(v1[0])}, ${fmt(v1[1])})</div>`);
+  mathbox.select('#v2label').set('html', `<div class="mathbox-label label-v2">v₂ = (${fmt(v2[0])}, ${fmt(v2[1])})</div>`);
+  mathbox.select('#sumlabel').set('html', `<div class="mathbox-label label-sum">v₁+v₂ = (${fmt(sum[0])}, ${fmt(sum[1])})</div>`);
 }
 
 // Attach listeners
