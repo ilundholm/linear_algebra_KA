@@ -17,18 +17,17 @@
     .container {
       display: flex;
       width: 100%;
-      height: 100vh;
-      min-height: 450px;
+      height: 500px;
     }
     
     .sidebar {
-      width: 280px;
-      min-width: 280px;
+      width: 260px;
+      min-width: 260px;
       background: #12121c;
-      padding: 25px 20px;
+      padding: 20px 15px;
       display: flex;
       flex-direction: column;
-      gap: 20px;
+      gap: 15px;
     }
     
     #mathbox {
@@ -39,12 +38,12 @@
     .vector-section {
       background: rgba(255,255,255,0.05);
       border-radius: 8px;
-      padding: 15px;
+      padding: 12px;
     }
     
     .vector-section h3 {
-      margin: 0 0 12px 0;
-      font-size: 16px;
+      margin: 0 0 10px 0;
+      font-size: 14px;
       display: flex;
       align-items: center;
       gap: 10px;
@@ -90,8 +89,8 @@
       align-items: center;
       justify-content: center;
       gap: 10px;
-      font-size: 18px;
-      margin-top: 10px;
+      font-size: 16px;
+      margin-top: 8px;
     }
     
     .col-vector {
@@ -111,21 +110,6 @@
     .v1-text { color: #e94560; }
     .v2-text { color: #4d80e4; }
     .sum-text { color: #16c79a; }
-    
-    .mode-toggle {
-      width: 100%;
-      background: #2a2a4a;
-      border: none;
-      color: #fff;
-      padding: 12px 16px;
-      border-radius: 6px;
-      cursor: pointer;
-      font-size: 14px;
-      margin-top: auto;
-    }
-    .mode-toggle:hover {
-      background: #3a3a5a;
-    }
   </style>
 </head>
 <body>
@@ -177,8 +161,6 @@
         <div class="col-vector"><span id="sumx-display">3.0</span><span id="sumy-display">3.0</span></div>
       </div>
     </div>
-    
-    <button class="mode-toggle" id="modeToggle">Mode: Tip-to-Tail</button>
   </div>
   
   <div id="mathbox"></div>
@@ -192,7 +174,6 @@
 // State
 let v1 = [2, 1, 0];
 let v2 = [1, 2, 0];
-let mode = 'tip-to-tail';
 
 function fmt(n) {
   return Number(n).toFixed(1);
@@ -247,7 +228,8 @@ view.text({
 });
 view.label({
   points: '#xlabels',
-  color: '#888888',
+  color: '#ffffff',
+  background: '#1a1a2e',
   size: 16,
   depth: 0.5,
 });
@@ -264,7 +246,8 @@ view.text({
 });
 view.label({
   points: '#ylabels',
-  color: '#888888',
+  color: '#ffffff',
+  background: '#1a1a2e',
   size: 16,
   depth: 0.5,
 });
@@ -343,7 +326,7 @@ view.line({
   points: '#ghost2points',
   color: '#e94560',
   width: 5,
-  opacity: 0,
+  opacity: 0.4,
 });
 
 // Sum vector (green)
@@ -407,25 +390,9 @@ function updateVectors() {
   document.getElementById('sumy-display').textContent = fmt(sum[1]);
 }
 
-function toggleMode() {
-  if (mode === 'tip-to-tail') {
-    mode = 'parallelogram';
-    document.getElementById('modeToggle').textContent = 'Mode: Parallelogram';
-    mathbox.select('#ghost1line').set('opacity', 0.4);
-    mathbox.select('#ghost2line').set('opacity', 0.4);
-  } else {
-    mode = 'tip-to-tail';
-    document.getElementById('modeToggle').textContent = 'Mode: Tip-to-Tail';
-    mathbox.select('#ghost1line').set('opacity', 0.4);
-    mathbox.select('#ghost2line').set('opacity', 0);
-  }
-}
-
 document.querySelectorAll('input[type="range"]').forEach(input => {
   input.addEventListener('input', updateVectors);
 });
-
-document.getElementById('modeToggle').addEventListener('click', toggleMode);
 </script>
 
 </body>
