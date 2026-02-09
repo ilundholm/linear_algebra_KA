@@ -4,13 +4,13 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Three Planes Intersection</title>
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/mathbox@2.3.1/build/mathbox.css">
   <style>
     * { box-sizing: border-box; }
     body { margin: 0; background: #1a1a2e; font-family: 'Segoe UI', sans-serif; color: #eee; }
     .container { display: flex; width: 100%; height: 500px; }
     .sidebar { width: 280px; min-width: 280px; background: #12121c; padding: 15px; display: flex; flex-direction: column; gap: 10px; overflow-y: auto; }
-    #mathbox { flex: 1; height: 100%; }
+    #canvas-container { flex: 1; height: 100%; position: relative; }
+    canvas { display: block; }
     .section { background: rgba(255,255,255,0.05); border-radius: 8px; padding: 10px; }
     .section h3 { margin: 0 0 8px 0; font-size: 13px; }
     .p1 { color: #e94560; }
@@ -18,11 +18,12 @@
     .p3 { color: #16c79a; }
     .preset-btn { width: 100%; padding: 10px; margin: 4px 0; background: #2a2a4a; border: none; color: #fff; border-radius: 6px; cursor: pointer; font-size: 12px; text-align: left; }
     .preset-btn:hover { background: #3a3a5a; }
+    .preset-btn.active { background: #4d80e4; }
     .result { text-align: center; padding: 12px; border-radius: 8px; font-size: 14px; margin-top: auto; }
     .one-sol { background: rgba(22, 199, 154, 0.3); border: 2px solid #16c79a; }
     .line-sol { background: rgba(241, 196, 15, 0.3); border: 2px solid #f1c40f; }
     .no-sol { background: rgba(231, 76, 60, 0.3); border: 2px solid #e74c3c; }
-    .info { font-size: 11px; color: #888; text-align: center; }
+    .eq-display { font-family: monospace; font-size: 12px; color: #888; margin-top: 4px; }
   </style>
 </head>
 <body>
@@ -30,120 +31,180 @@
   <div class="sidebar">
     <div class="section">
       <h3>Presets</h3>
-      <button class="preset-btn" onclick="setPreset('point')">✓ One point (unique solution)</button>
-      <button class="preset-btn" onclick="setPreset('line')">↔ Line of solutions (∞)</button>
-      <button class="preset-btn" onclick="setPreset('parallel')">✗ Parallel planes (no solution)</button>
-      <button class="preset-btn" onclick="setPreset('triangle')">✗ Triangle pattern (no solution)</button>
+      <button class="preset-btn active" id="btn-point" onclick="setPreset('point')">✓ One point (unique solution)</button>
+      <button class="preset-btn" id="btn-line" onclick="setPreset('line')">↔ Line of solutions (∞)</button>
+      <button class="preset-btn" id="btn-parallel" onclick="setPreset('parallel')">✗ Parallel planes (no solution)</button>
+      <button class="preset-btn" id="btn-triangle" onclick="setPreset('triangle')">✗ Triangle pattern (no solution)</button>
     </div>
     <div class="section">
-      <h3 class="p1">Plane 1: ax + by + cz = d</h3>
-      <div class="info">z = 0</div>
+      <h3 class="p1">Plane 1 (red)</h3>
+      <div class="eq-display" id="eq1">z = 0</div>
     </div>
     <div class="section">
-      <h3 class="p2">Plane 2: ax + by + cz = d</h3>
-      <div class="info">y = 0</div>
+      <h3 class="p2">Plane 2 (blue)</h3>
+      <div class="eq-display" id="eq2">y = 0</div>
     </div>
     <div class="section">
-      <h3 class="p3">Plane 3: ax + by + cz = d</h3>
-      <div class="info">x = 0</div>
+      <h3 class="p3">Plane 3 (green)</h3>
+      <div class="eq-display" id="eq3">x = 0</div>
     </div>
     <div class="section result one-sol" id="result">
       Intersect at one point: (0, 0, 0)
     </div>
   </div>
-  <div id="mathbox"></div>
+  <div id="canvas-container"></div>
 </div>
+
 <script src="https://cdn.jsdelivr.net/npm/three@0.137.0/build/three.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/three@0.137.0/examples/js/controls/OrbitControls.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/mathbox@2.3.1/build/bundle/mathbox.js"></script>
 <script>
-let preset = 'point';
+const container = document.getElementById('canvas-container');
+const width = container.clientWidth;
+const height = container.clientHeight;
 
-const mathbox = MathBox.mathBox({
-  element: document.getElementById('mathbox'),
-  plugins: ['core', 'controls', 'cursor'],
-  controls: { klass: THREE.OrbitControls },
-  camera: { fov: 45 },
-});
-mathbox.three.renderer.setClearColor(new THREE.Color('#1a1a2e'), 1.0);
-mathbox.camera({ proxy: true, position: [3, 2, 4] });
+// Scene setup
+const scene = new THREE.Scene();
+scene.background = new THREE.Color('#1a1a2e');
 
-const view = mathbox.cartesian({ range: [[-2, 2], [-2, 2], [-2, 2]], scale: [1.5, 1.5, 1.5] });
-view.axis({ axis: 1, width: 2, color: '#666' });
-view.axis({ axis: 2, width: 2, color: '#666' });
-view.axis({ axis: 3, width: 2, color: '#666' });
+const camera = new THREE.PerspectiveCamera(45, width / height, 0.1, 100);
+camera.position.set(4, 3, 5);
+camera.lookAt(0, 0, 0);
 
-// Plane functions (simplified)
-function createPlaneGrid(fn, id, color) {
-  const pts = [];
-  for (let u = -2; u <= 2; u += 0.5) {
-    for (let v = -2; v <= 2; v += 0.5) {
-      pts.push(fn(u, v));
-    }
-  }
-  view.array({ id: id+'pts', width: pts.length, channels: 3, data: pts });
-  view.point({ points: '#'+id+'pts', color: color, size: 4, opacity: 0.5 });
+const renderer = new THREE.WebGLRenderer({ antialias: true });
+renderer.setSize(width, height);
+container.appendChild(renderer.domElement);
+
+const controls = new THREE.OrbitControls(camera, renderer.domElement);
+controls.enableDamping = true;
+
+// Axes
+const axesHelper = new THREE.AxesHelper(3);
+scene.add(axesHelper);
+
+// Grid on XY plane (faint)
+const gridHelper = new THREE.GridHelper(6, 6, '#333', '#222');
+gridHelper.rotation.x = Math.PI / 2;
+scene.add(gridHelper);
+
+// Plane materials
+const matP1 = new THREE.MeshBasicMaterial({ color: 0xe94560, transparent: true, opacity: 0.4, side: THREE.DoubleSide });
+const matP2 = new THREE.MeshBasicMaterial({ color: 0x4d80e4, transparent: true, opacity: 0.4, side: THREE.DoubleSide });
+const matP3 = new THREE.MeshBasicMaterial({ color: 0x16c79a, transparent: true, opacity: 0.4, side: THREE.DoubleSide });
+
+// Create plane geometry
+function createPlaneGeom() {
+  return new THREE.PlaneGeometry(5, 5);
 }
 
-// z = 0 (red)
-view.array({ id: 'p1', width: 4, channels: 3, data: [[-2,-2,0],[-2,2,0],[2,2,0],[2,-2,0]] });
-view.surface({ points: '#p1', color: '#e94560', opacity: 0.3, shaded: false });
+// Plane meshes
+let plane1 = new THREE.Mesh(createPlaneGeom(), matP1);
+let plane2 = new THREE.Mesh(createPlaneGeom(), matP2);
+let plane3 = new THREE.Mesh(createPlaneGeom(), matP3);
 
-// y = 0 (blue)
-view.array({ id: 'p2', width: 4, channels: 3, data: [[-2,0,-2],[-2,0,2],[2,0,2],[2,0,-2]] });
-view.surface({ points: '#p2', color: '#4d80e4', opacity: 0.3, shaded: false });
-
-// x = 0 (green)
-view.array({ id: 'p3', width: 4, channels: 3, data: [[0,-2,-2],[0,-2,2],[0,2,2],[0,2,-2]] });
-view.surface({ points: '#p3', color: '#16c79a', opacity: 0.3, shaded: false });
+scene.add(plane1);
+scene.add(plane2);
+scene.add(plane3);
 
 // Intersection point
-view.array({ id: 'intpt', width: 1, channels: 3, data: [[0,0,0]] });
-view.point({ points: '#intpt', color: '#ffffff', size: 20 });
+const pointGeom = new THREE.SphereGeometry(0.12, 16, 16);
+const pointMat = new THREE.MeshBasicMaterial({ color: 0xffffff });
+let intPoint = new THREE.Mesh(pointGeom, pointMat);
+scene.add(intPoint);
 
-// Intersection line (hidden by default)
-view.array({ id: 'intline', width: 2, channels: 3, data: [[0,0,-2],[0,0,2]] });
-view.line({ id: 'intlineshape', points: '#intline', color: '#f1c40f', width: 6, opacity: 0 });
+// Intersection line
+const lineMat = new THREE.LineBasicMaterial({ color: 0xf1c40f, linewidth: 3 });
+const lineGeom = new THREE.BufferGeometry().setFromPoints([
+  new THREE.Vector3(0, -3, 0),
+  new THREE.Vector3(0, 3, 0)
+]);
+let intLine = new THREE.Line(lineGeom, lineMat);
+intLine.visible = false;
+scene.add(intLine);
 
 function setPreset(p) {
-  preset = p;
+  // Reset button styles
+  document.querySelectorAll('.preset-btn').forEach(btn => btn.classList.remove('active'));
+  document.getElementById('btn-' + p).classList.add('active');
+  
   const result = document.getElementById('result');
+  intLine.visible = false;
+  intPoint.visible = true;
   
   if (p === 'point') {
-    mathbox.select('#p1').set('data', [[-2,-2,0],[-2,2,0],[2,2,0],[2,-2,0]]);
-    mathbox.select('#p2').set('data', [[-2,0,-2],[-2,0,2],[2,0,2],[2,0,-2]]);
-    mathbox.select('#p3').set('data', [[0,-2,-2],[0,-2,2],[0,2,2],[0,2,-2]]);
-    mathbox.select('#intpt').set('data', [[0,0,0]]);
-    mathbox.select('#intlineshape').set('opacity', 0);
+    // z=0, y=0, x=0 → intersect at origin
+    plane1.rotation.set(0, 0, 0); plane1.position.set(0, 0, 0);
+    plane2.rotation.set(Math.PI/2, 0, 0); plane2.position.set(0, 0, 0);
+    plane3.rotation.set(0, Math.PI/2, 0); plane3.position.set(0, 0, 0);
+    intPoint.position.set(0, 0, 0);
+    
+    document.getElementById('eq1').textContent = 'z = 0';
+    document.getElementById('eq2').textContent = 'y = 0';
+    document.getElementById('eq3').textContent = 'x = 0';
     result.textContent = 'Intersect at one point: (0, 0, 0)';
     result.className = 'section result one-sol';
+    
   } else if (p === 'line') {
-    mathbox.select('#p1').set('data', [[-2,-2,0],[-2,2,0],[2,2,0],[2,-2,0]]);
-    mathbox.select('#p2').set('data', [[-2,-2,0],[-2,2,0],[2,2,0],[2,-2,0]]);
-    mathbox.select('#p3').set('data', [[0,-2,-2],[0,-2,2],[0,2,2],[0,2,-2]]);
-    mathbox.select('#intpt').set('data', [[100,100,100]]);
-    mathbox.select('#intline').set('data', [[0,-2,0],[0,2,0]]);
-    mathbox.select('#intlineshape').set('opacity', 1);
+    // Two planes are z=0, one is x=0 → intersect along y-axis
+    plane1.rotation.set(0, 0, 0); plane1.position.set(0, 0, 0);
+    plane2.rotation.set(0, 0, 0); plane2.position.set(0, 0, 0.01); // same as plane1
+    plane3.rotation.set(0, Math.PI/2, 0); plane3.position.set(0, 0, 0);
+    intPoint.visible = false;
+    intLine.visible = true;
+    lineGeom.setFromPoints([new THREE.Vector3(0, -3, 0), new THREE.Vector3(0, 3, 0)]);
+    
+    document.getElementById('eq1').textContent = 'z = 0';
+    document.getElementById('eq2').textContent = 'z = 0 (same)';
+    document.getElementById('eq3').textContent = 'x = 0';
     result.textContent = 'Intersect along a line (∞ solutions)';
     result.className = 'section result line-sol';
+    
   } else if (p === 'parallel') {
-    mathbox.select('#p1').set('data', [[-2,-2,0],[-2,2,0],[2,2,0],[2,-2,0]]);
-    mathbox.select('#p2').set('data', [[-2,-2,1],[-2,2,1],[2,2,1],[2,-2,1]]);
-    mathbox.select('#p3').set('data', [[-2,-2,2],[-2,2,2],[2,2,2],[2,-2,2]]);
-    mathbox.select('#intpt').set('data', [[100,100,100]]);
-    mathbox.select('#intlineshape').set('opacity', 0);
+    // Three parallel horizontal planes at different z
+    plane1.rotation.set(0, 0, 0); plane1.position.set(0, 0, -1);
+    plane2.rotation.set(0, 0, 0); plane2.position.set(0, 0, 0);
+    plane3.rotation.set(0, 0, 0); plane3.position.set(0, 0, 1);
+    intPoint.visible = false;
+    
+    document.getElementById('eq1').textContent = 'z = -1';
+    document.getElementById('eq2').textContent = 'z = 0';
+    document.getElementById('eq3').textContent = 'z = 1';
     result.textContent = 'Parallel planes — no intersection!';
     result.className = 'section result no-sol';
+    
   } else if (p === 'triangle') {
-    mathbox.select('#p1').set('data', [[-2,-2,0],[-2,2,0],[2,2,0],[2,-2,0]]);
-    mathbox.select('#p2').set('data', [[-2,0,-2],[-2,0,2],[2,0,2],[2,0,-2]]);
-    mathbox.select('#p3').set('data', [[-2,-2,1],[-2,2,1],[2,2,1],[2,-2,1]]);
-    mathbox.select('#intpt').set('data', [[100,100,100]]);
-    mathbox.select('#intlineshape').set('opacity', 0);
+    // Three planes that pairwise intersect but have no common point
+    plane1.rotation.set(0, 0, 0); plane1.position.set(0, 0, 0); // z = 0
+    plane2.rotation.set(Math.PI/2, 0, 0); plane2.position.set(0, 0, 0); // y = 0
+    plane3.rotation.set(0, 0, 0); plane3.position.set(0, 0, 1); // z = 1
+    intPoint.visible = false;
+    
+    document.getElementById('eq1').textContent = 'z = 0';
+    document.getElementById('eq2').textContent = 'y = 0';
+    document.getElementById('eq3').textContent = 'z = 1';
     result.textContent = 'Pairwise intersect but no common point!';
     result.className = 'section result no-sol';
   }
 }
+
+// Initial state
+setPreset('point');
+
+// Animation loop
+function animate() {
+  requestAnimationFrame(animate);
+  controls.update();
+  renderer.render(scene, camera);
+}
+animate();
+
+// Handle resize
+window.addEventListener('resize', () => {
+  const w = container.clientWidth;
+  const h = container.clientHeight;
+  camera.aspect = w / h;
+  camera.updateProjectionMatrix();
+  renderer.setSize(w, h);
+});
 </script>
 </body>
 </html>
