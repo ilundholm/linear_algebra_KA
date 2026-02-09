@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Parametric Solution Explorer</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/mathbox@2.3.1/build/mathbox.css">
+  <style>
+    * { box-sizing: border-box; }
+    body { margin: 0; background: #1a1a2e; font-family: 'Segoe UI', sans-serif; color: #eee; }
+    .container { display: flex; width: 100%; height: 500px; }
+    .sidebar { width: 280px; min-width: 280px; background: #12121c; padding: 20px 15px; display: flex; flex-direction: column; gap: 12px; }
+    #mathbox { flex: 1; height: 100%; }
+    .section { background: rgba(255,255,255,0.05); border-radius: 8px; padding: 12px; }
+    .section h3 { margin: 0 0 10px 0; font-size: 14px; color: #aaa; }
+    .slider-row { display: flex; align-items: center; margin: 8px 0; gap: 10px; }
+    .slider-row label { width: 25px; font-size: 14px; color: #aaa; }
+    .slider-row input[type="range"] { flex: 1; }
+    .slider-row .value { width: 50px; text-align: right; font-size: 14px; font-family: monospace; }
+    .parametric { font-family: monospace; font-size: 14px; line-height: 1.8; }
+    .particular { color: #16c79a; }
+    .direction { color: #f39c12; }
+    .param { color: #e94560; }
+    .current-point { text-align: center; font-size: 18px; margin-top: 10px; padding: 10px; background: rgba(22,199,154,0.2); border-radius: 8px; }
+    .info { font-size: 12px; color: #888; text-align: center; }
+  </style>
+</head>
+<body>
+<div class="container">
+  <div class="sidebar">
+    <div class="section">
+      <h3>Parametric Form</h3>
+      <div class="parametric">
+        x = <span class="particular">p</span> + <span class="param">t</span>·<span class="direction">d</span>
+      </div>
+      <div class="parametric" style="margin-top:10px;">
+        <span class="particular">p</span> = (2, 1) &nbsp; particular solution<br>
+        <span class="direction">d</span> = (1, 2) &nbsp; direction vector
+      </div>
+    </div>
+    <div class="section">
+      <h3>Parameter <span class="param">t</span></h3>
+      <div class="slider-row">
+        <label class="param">t:</label>
+        <input type="range" id="t" min="-3" max="3" step="0.1" value="0">
+        <span class="value" id="t-val">0.0</span>
+      </div>
+    </div>
+    <div class="section current-point">
+      x = (<span id="px">2.0</span>, <span id="py">1.0</span>)
+    </div>
+    <div class="info">Drag t to move along the solution line!</div>
+  </div>
+  <div id="mathbox"></div>
+</div>
+<script src="https://cdn.jsdelivr.net/npm/three@0.137.0/build/three.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/three@0.137.0/examples/js/controls/OrbitControls.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/mathbox@2.3.1/build/bundle/mathbox.js"></script>
+<script>
+const p = [2, 1]; // particular solution
+const d = [1, 2]; // direction
+let t = 0;
+function fmt(n) { return Number(n).toFixed(1); }
+
+const mathbox = MathBox.mathBox({
+  element: document.getElementById('mathbox'),
+  plugins: ['core', 'controls', 'cursor'],
+  controls: { klass: THREE.OrbitControls },
+  camera: { fov: 45 },
+});
+mathbox.three.renderer.setClearColor(new THREE.Color('#1a1a2e'), 1.0);
+mathbox.camera({ proxy: true, position: [0, 0, 6] });
+
+const view = mathbox.cartesian({ range: [[-5, 8], [-5, 8], [-1, 1]], scale: [2, 2, 1] });
+view.grid({ axes: [1, 2], width: 1, color: '#444', depth: 0.5 });
+view.axis({ axis: 1, width: 3, color: '#ffffff' });
+view.axis({ axis: 2, width: 3, color: '#ffffff' });
+
+// Solution line (extends beyond visible range)
+view.array({ id: 'line', width: 2, channels: 3, data: [
+  [p[0] - 5*d[0], p[1] - 5*d[1], 0],
+  [p[0] + 5*d[0], p[1] + 5*d[1], 0]
+]});
+view.line({ points: '#line', color: '#f39c12', width: 4, opacity: 0.6 });
+
+// Particular solution point
+view.array({ id: 'ppt', width: 1, channels: 3, data: [[p[0], p[1], 0]] });
+view.point({ points: '#ppt', color: '#16c79a', size: 20 });
+
+// Direction vector from origin (faded)
+view.array({ id: 'dpts', width: 2, channels: 3, data: [[0,0,0], [d[0], d[1], 0]] });
+view.line({ points: '#dpts', color: '#f39c12', width: 4, opacity: 0.3 });
+
+// Current point
+function currentPoint() {
+  return [p[0] + t*d[0], p[1] + t*d[1], 0];
+}
+view.array({ id: 'cur', width: 1, channels: 3, data: [currentPoint()] });
+view.point({ points: '#cur', color: '#e94560', size: 25 });
+
+// Vector from p to current
+view.array({ id: 'td', width: 2, channels: 3, data: [[p[0], p[1], 0], currentPoint()] });
+view.line({ points: '#td', color: '#e94560', width: 6 });
+
+function update() {
+  t = parseFloat(document.getElementById('t').value);
+  const cur = currentPoint();
+  
+  mathbox.select('#cur').set('data', [cur]);
+  mathbox.select('#td').set('data', [[p[0], p[1], 0], cur]);
+  
+  document.getElementById('t-val').textContent = fmt(t);
+  document.getElementById('px').textContent = fmt(cur[0]);
+  document.getElementById('py').textContent = fmt(cur[1]);
+}
+
+document.getElementById('t').addEventListener('input', update);
+</script>
+</body>
+</html>

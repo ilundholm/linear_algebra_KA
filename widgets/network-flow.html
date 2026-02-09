@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Network Flow</title>
+  <style>
+    * { box-sizing: border-box; }
+    body { margin: 0; background: #1a1a2e; font-family: 'Segoe UI', sans-serif; color: #eee; padding: 20px; }
+    .container { max-width: 800px; margin: 0 auto; }
+    h2 { color: #16c79a; text-align: center; }
+    .network { position: relative; width: 500px; height: 350px; margin: 30px auto; }
+    .node { position: absolute; width: 60px; height: 60px; border-radius: 50%; background: #4d80e4; display: flex; align-items: center; justify-content: center; font-weight: bold; font-size: 18px; }
+    .node.source { background: #16c79a; }
+    .node.sink { background: #e94560; }
+    .arrow { position: absolute; background: #f39c12; transform-origin: left center; }
+    .flow-label { position: absolute; background: #2a2a4a; padding: 4px 8px; border-radius: 4px; font-size: 14px; font-family: monospace; }
+    .controls { display: flex; gap: 20px; justify-content: center; flex-wrap: wrap; margin: 20px 0; }
+    .control { background: rgba(255,255,255,0.05); padding: 15px; border-radius: 8px; }
+    .control label { display: block; margin-bottom: 8px; color: #aaa; }
+    .control input { width: 80px; padding: 8px; background: #2a2a4a; border: 1px solid #444; color: #fff; border-radius: 4px; font-size: 16px; text-align: center; }
+    .status { text-align: center; padding: 15px; border-radius: 8px; margin: 20px auto; max-width: 400px; }
+    .valid { background: rgba(22, 199, 154, 0.3); border: 2px solid #16c79a; }
+    .invalid { background: rgba(231, 76, 60, 0.3); border: 2px solid #e74c3c; }
+    .info { text-align: center; color: #888; font-size: 13px; margin-top: 20px; }
+  </style>
+</head>
+<body>
+<div class="container">
+  <h2>Network Flow Conservation</h2>
+  
+  <div class="network">
+    <div class="node source" style="left: 20px; top: 140px;">S</div>
+    <div class="node" style="left: 180px; top: 50px;">A</div>
+    <div class="node" style="left: 180px; top: 230px;">B</div>
+    <div class="node" style="left: 340px; top: 140px;">C</div>
+    <div class="node sink" style="left: 420px; top: 140px;">T</div>
+    
+    <!-- Arrows (simplified as lines) -->
+    <svg style="position:absolute; width:100%; height:100%; pointer-events:none;">
+      <defs>
+        <marker id="arrowhead" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto">
+          <polygon points="0 0, 10 3.5, 0 7" fill="#f39c12" />
+        </marker>
+      </defs>
+      <line x1="80" y1="160" x2="175" y2="90" stroke="#f39c12" stroke-width="3" marker-end="url(#arrowhead)"/>
+      <line x1="80" y1="180" x2="175" y2="250" stroke="#f39c12" stroke-width="3" marker-end="url(#arrowhead)"/>
+      <line x1="240" y1="80" x2="335" y2="150" stroke="#f39c12" stroke-width="3" marker-end="url(#arrowhead)"/>
+      <line x1="240" y1="260" x2="335" y2="180" stroke="#f39c12" stroke-width="3" marker-end="url(#arrowhead)"/>
+      <line x1="210" y1="115" x2="210" y2="225" stroke="#f39c12" stroke-width="3" marker-end="url(#arrowhead)"/>
+      <line x1="400" y1="170" x2="420" y2="170" stroke="#f39c12" stroke-width="3" marker-end="url(#arrowhead)"/>
+    </svg>
+    
+    <div class="flow-label" style="left: 100px; top: 90px;">x₁ = <span id="f1">5</span></div>
+    <div class="flow-label" style="left: 100px; top: 210px;">x₂ = <span id="f2">3</span></div>
+    <div class="flow-label" style="left: 270px; top: 90px;">x₃ = <span id="f3">5</span></div>
+    <div class="flow-label" style="left: 270px; top: 210px;">x₄ = <span id="f4">3</span></div>
+    <div class="flow-label" style="left: 220px; top: 150px;">x₅ = <span id="f5">0</span></div>
+  </div>
+  
+  <div class="controls">
+    <div class="control"><label>x₁ (S→A)</label><input type="number" id="x1" value="5" min="0"></div>
+    <div class="control"><label>x₂ (S→B)</label><input type="number" id="x2" value="3" min="0"></div>
+    <div class="control"><label>x₃ (A→C)</label><input type="number" id="x3" value="5" min="0"></div>
+    <div class="control"><label>x₄ (B→C)</label><input type="number" id="x4" value="3" min="0"></div>
+    <div class="control"><label>x₅ (A→B)</label><input type="number" id="x5" value="0"></div>
+  </div>
+  
+  <div class="status" id="status">Flow is balanced at all nodes!</div>
+  
+  <div class="info">
+    Conservation: Flow in = Flow out at each node<br>
+    Node A: x₁ = x₃ + x₅<br>
+    Node B: x₂ + x₅ = x₄
+  </div>
+</div>
+
+<script>
+function check() {
+  const x1 = parseFloat(document.getElementById('x1').value) || 0;
+  const x2 = parseFloat(document.getElementById('x2').value) || 0;
+  const x3 = parseFloat(document.getElementById('x3').value) || 0;
+  const x4 = parseFloat(document.getElementById('x4').value) || 0;
+  const x5 = parseFloat(document.getElementById('x5').value) || 0;
+  
+  document.getElementById('f1').textContent = x1;
+  document.getElementById('f2').textContent = x2;
+  document.getElementById('f3').textContent = x3;
+  document.getElementById('f4').textContent = x4;
+  document.getElementById('f5').textContent = x5;
+  
+  const nodeA = x1 - x3 - x5;
+  const nodeB = x2 + x5 - x4;
+  
+  const status = document.getElementById('status');
+  if (Math.abs(nodeA) < 0.01 && Math.abs(nodeB) < 0.01) {
+    status.textContent = '✓ Flow is balanced at all nodes!';
+    status.className = 'status valid';
+  } else {
+    let msg = 'Imbalance: ';
+    if (Math.abs(nodeA) > 0.01) msg += `Node A (${nodeA > 0 ? '+' : ''}${nodeA.toFixed(1)}) `;
+    if (Math.abs(nodeB) > 0.01) msg += `Node B (${nodeB > 0 ? '+' : ''}${nodeB.toFixed(1)})`;
+    status.textContent = msg;
+    status.className = 'status invalid';
+  }
+}
+
+document.querySelectorAll('input').forEach(input => input.addEventListener('input', check));
+check();
+</script>
+</body>
+</html>

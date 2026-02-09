@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Line Intersection Explorer</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/mathbox@2.3.1/build/mathbox.css">
+  <style>
+    * { box-sizing: border-box; }
+    body { margin: 0; background: #1a1a2e; font-family: 'Segoe UI', sans-serif; color: #eee; }
+    .container { display: flex; width: 100%; height: 500px; }
+    .sidebar { width: 280px; min-width: 280px; background: #12121c; padding: 20px 15px; display: flex; flex-direction: column; gap: 12px; }
+    #mathbox { flex: 1; height: 100%; }
+    .section { background: rgba(255,255,255,0.05); border-radius: 8px; padding: 12px; }
+    .section h3 { margin: 0 0 10px 0; font-size: 14px; }
+    .line1 { color: #e94560; }
+    .line2 { color: #4d80e4; }
+    .slider-row { display: flex; align-items: center; margin: 6px 0; gap: 8px; }
+    .slider-row label { width: 60px; font-size: 13px; color: #aaa; }
+    .slider-row input[type="range"] { flex: 1; }
+    .slider-row .value { width: 45px; text-align: right; font-size: 13px; font-family: monospace; }
+    .equation { font-family: monospace; font-size: 16px; text-align: center; margin-top: 8px; }
+    .result { text-align: center; padding: 12px; border-radius: 8px; font-size: 14px; }
+    .one-solution { background: rgba(22, 199, 154, 0.3); border: 2px solid #16c79a; }
+    .no-solution { background: rgba(231, 76, 60, 0.3); border: 2px solid #e74c3c; }
+    .infinite { background: rgba(241, 196, 15, 0.3); border: 2px solid #f1c40f; }
+  </style>
+</head>
+<body>
+<div class="container">
+  <div class="sidebar">
+    <div class="section">
+      <h3 class="line1">Line 1: y = m₁x + b₁</h3>
+      <div class="slider-row"><label>slope m₁:</label><input type="range" id="m1" min="-3" max="3" step="0.1" value="1"><span class="value" id="m1-val">1.0</span></div>
+      <div class="slider-row"><label>intercept b₁:</label><input type="range" id="b1" min="-3" max="3" step="0.1" value="0"><span class="value" id="b1-val">0.0</span></div>
+      <div class="equation line1">y = <span id="eq1">1.0x + 0.0</span></div>
+    </div>
+    <div class="section">
+      <h3 class="line2">Line 2: y = m₂x + b₂</h3>
+      <div class="slider-row"><label>slope m₂:</label><input type="range" id="m2" min="-3" max="3" step="0.1" value="-1"><span class="value" id="m2-val">-1.0</span></div>
+      <div class="slider-row"><label>intercept b₂:</label><input type="range" id="b2" min="-3" max="3" step="0.1" value="2"><span class="value" id="b2-val">2.0</span></div>
+      <div class="equation line2">y = <span id="eq2">-1.0x + 2.0</span></div>
+    </div>
+    <div class="section result" id="result">Solution: (1.0, 1.0)</div>
+  </div>
+  <div id="mathbox"></div>
+</div>
+<script src="https://cdn.jsdelivr.net/npm/three@0.137.0/build/three.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/three@0.137.0/examples/js/controls/OrbitControls.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/mathbox@2.3.1/build/bundle/mathbox.js"></script>
+<script>
+let m1=1, b1=0, m2=-1, b2=2;
+function fmt(n) { return Number(n).toFixed(1); }
+function fmtEq(m, b) {
+  const ms = fmt(m);
+  const bs = b >= 0 ? ' + ' + fmt(b) : ' - ' + fmt(Math.abs(b));
+  return ms + 'x' + bs;
+}
+
+const mathbox = MathBox.mathBox({
+  element: document.getElementById('mathbox'),
+  plugins: ['core', 'controls', 'cursor'],
+  controls: { klass: THREE.OrbitControls },
+  camera: { fov: 45 },
+});
+mathbox.three.renderer.setClearColor(new THREE.Color('#1a1a2e'), 1.0);
+mathbox.camera({ proxy: true, position: [0, 0, 6] });
+
+const view = mathbox.cartesian({ range: [[-5, 5], [-5, 5], [-1, 1]], scale: [2, 2, 1] });
+view.grid({ axes: [1, 2], width: 1, color: '#444', depth: 0.5 });
+view.axis({ axis: 1, width: 3, color: '#ffffff' });
+view.axis({ axis: 2, width: 3, color: '#ffffff' });
+
+view.array({ id: 'xlabels', width: 4, channels: 3, data: [[-4,-0.5,0],[-2,-0.5,0],[2,-0.5,0],[4,-0.5,0]] });
+view.text({ data: ['-4','-2','2','4'] });
+view.label({ points: '#xlabels', color: '#ffffff', background: '#1a1a2e', size: 16, depth: 0.5 });
+
+// Line 1
+function line1Pts() {
+  return [[-5, m1*(-5)+b1, 0], [5, m1*5+b1, 0]];
+}
+view.array({ id: 'l1pts', width: 2, channels: 3, data: line1Pts() });
+view.line({ points: '#l1pts', color: '#e94560', width: 6 });
+
+// Line 2
+function line2Pts() {
+  return [[-5, m2*(-5)+b2, 0], [5, m2*5+b2, 0]];
+}
+view.array({ id: 'l2pts', width: 2, channels: 3, data: line2Pts() });
+view.line({ points: '#l2pts', color: '#4d80e4', width: 6 });
+
+// Intersection point
+view.array({ id: 'intpt', width: 1, channels: 3, data: [[1, 1, 0]] });
+view.point({ points: '#intpt', color: '#16c79a', size: 25 });
+
+function update() {
+  m1 = parseFloat(document.getElementById('m1').value);
+  b1 = parseFloat(document.getElementById('b1').value);
+  m2 = parseFloat(document.getElementById('m2').value);
+  b2 = parseFloat(document.getElementById('b2').value);
+  
+  mathbox.select('#l1pts').set('data', line1Pts());
+  mathbox.select('#l2pts').set('data', line2Pts());
+  
+  document.getElementById('m1-val').textContent = fmt(m1);
+  document.getElementById('b1-val').textContent = fmt(b1);
+  document.getElementById('m2-val').textContent = fmt(m2);
+  document.getElementById('b2-val').textContent = fmt(b2);
+  document.getElementById('eq1').textContent = fmtEq(m1, b1);
+  document.getElementById('eq2').textContent = fmtEq(m2, b2);
+  
+  const result = document.getElementById('result');
+  if (Math.abs(m1 - m2) < 0.01) {
+    if (Math.abs(b1 - b2) < 0.01) {
+      result.textContent = '∞ solutions (same line)';
+      result.className = 'section result infinite';
+      mathbox.select('#intpt').set('data', [[100, 100, 0]]); // hide
+    } else {
+      result.textContent = 'No solution (parallel)';
+      result.className = 'section result no-solution';
+      mathbox.select('#intpt').set('data', [[100, 100, 0]]); // hide
+    }
+  } else {
+    const x = (b2 - b1) / (m1 - m2);
+    const y = m1 * x + b1;
+    result.textContent = `Solution: (${fmt(x)}, ${fmt(y)})`;
+    result.className = 'section result one-solution';
+    mathbox.select('#intpt').set('data', [[x, y, 0]]);
+  }
+}
+
+document.querySelectorAll('input[type="range"]').forEach(input => input.addEventListener('input', update));
+update();
+</script>
+</body>
+</html>

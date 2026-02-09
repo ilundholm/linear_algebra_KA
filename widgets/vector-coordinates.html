@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Vector Coordinate Explorer</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/mathbox@2.3.1/build/mathbox.css">
+  <style>
+    * { box-sizing: border-box; }
+    body { margin: 0; background: #1a1a2e; font-family: 'Segoe UI', sans-serif; color: #eee; }
+    .container { display: flex; width: 100%; height: 500px; }
+    .sidebar { width: 260px; min-width: 260px; background: #12121c; padding: 20px 15px; display: flex; flex-direction: column; gap: 15px; }
+    #mathbox { flex: 1; height: 100%; }
+    .section { background: rgba(255,255,255,0.05); border-radius: 8px; padding: 15px; }
+    .section h3 { margin: 0 0 10px 0; font-size: 14px; color: #aaa; }
+    .slider-row { display: flex; align-items: center; margin: 8px 0; gap: 10px; }
+    .slider-row label { width: 25px; font-size: 14px; color: #aaa; }
+    .slider-row input[type="range"] { flex: 1; }
+    .slider-row .value { width: 45px; text-align: right; font-size: 14px; font-family: monospace; }
+    .vector-display { display: flex; align-items: center; justify-content: center; gap: 10px; font-size: 20px; margin-top: 10px; }
+    .col-vector { display: inline-flex; flex-direction: column; align-items: center; border-left: 2px solid #16c79a; border-right: 2px solid #16c79a; padding: 3px 12px; border-radius: 3px; color: #16c79a; }
+    .col-vector span { line-height: 1.4; font-family: monospace; }
+    .info { font-size: 13px; color: #888; text-align: center; line-height: 1.6; }
+    .magnitude { text-align: center; margin-top: 10px; color: #f39c12; font-size: 14px; }
+  </style>
+</head>
+<body>
+<div class="container">
+  <div class="sidebar">
+    <div class="section">
+      <h3>Vector Coordinates</h3>
+      <div class="slider-row">
+        <label>x:</label>
+        <input type="range" id="vx" min="-3" max="3" step="0.1" value="2">
+        <span class="value" id="vx-val">2.0</span>
+      </div>
+      <div class="slider-row">
+        <label>y:</label>
+        <input type="range" id="vy" min="-3" max="3" step="0.1" value="1">
+        <span class="value" id="vy-val">1.0</span>
+      </div>
+      <div class="vector-display">
+        <strong style="color: #16c79a;">v</strong> = 
+        <div class="col-vector">
+          <span id="dx">2.0</span>
+          <span id="dy">1.0</span>
+        </div>
+      </div>
+      <div class="magnitude">|v| = <span id="mag">2.24</span></div>
+    </div>
+    <div class="section info">
+      The vector v points from the origin (0, 0) to the point (x, y).<br><br>
+      Its magnitude (length) is:<br>
+      √(x² + y²)
+    </div>
+  </div>
+  <div id="mathbox"></div>
+</div>
+<script src="https://cdn.jsdelivr.net/npm/three@0.137.0/build/three.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/three@0.137.0/examples/js/controls/OrbitControls.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/mathbox@2.3.1/build/bundle/mathbox.js"></script>
+<script>
+let v = [2, 1];
+function fmt(n) { return Number(n).toFixed(1); }
+function fmt2(n) { return Number(n).toFixed(2); }
+
+const mathbox = MathBox.mathBox({
+  element: document.getElementById('mathbox'),
+  plugins: ['core', 'controls', 'cursor'],
+  controls: { klass: THREE.OrbitControls },
+  camera: { fov: 45 },
+});
+mathbox.three.renderer.setClearColor(new THREE.Color('#1a1a2e'), 1.0);
+mathbox.camera({ proxy: true, position: [0, 0, 6] });
+
+const view = mathbox.cartesian({ range: [[-4, 4], [-4, 4], [-1, 1]], scale: [2, 2, 1] });
+view.grid({ axes: [1, 2], width: 1, color: '#444', depth: 0.5 });
+view.axis({ axis: 1, width: 3, color: '#ffffff' });
+view.axis({ axis: 2, width: 3, color: '#ffffff' });
+
+view.array({ id: 'xlabels', width: 6, channels: 3, data: [[-3,-0.5,0],[-2,-0.5,0],[-1,-0.5,0],[1,-0.5,0],[2,-0.5,0],[3,-0.5,0]] });
+view.text({ data: ['-3','-2','-1','1','2','3'] });
+view.label({ points: '#xlabels', color: '#ffffff', background: '#1a1a2e', size: 16, depth: 0.5 });
+view.array({ id: 'ylabels', width: 6, channels: 3, data: [[-0.5,-3,0],[-0.5,-2,0],[-0.5,-1,0],[-0.5,1,0],[-0.5,2,0],[-0.5,3,0]] });
+view.text({ data: ['-3','-2','-1','1','2','3'] });
+view.label({ points: '#ylabels', color: '#ffffff', background: '#1a1a2e', size: 16, depth: 0.5 });
+
+// Dashed lines to show coordinates
+view.array({ id: 'xproj', width: 2, channels: 3, data: [[v[0], 0, 0], [v[0], v[1], 0]] });
+view.line({ points: '#xproj', color: '#e94560', width: 2, opacity: 0.5 });
+view.array({ id: 'yproj', width: 2, channels: 3, data: [[0, v[1], 0], [v[0], v[1], 0]] });
+view.line({ points: '#yproj', color: '#4d80e4', width: 2, opacity: 0.5 });
+
+// Main vector
+view.array({ id: 'vpts', width: 2, channels: 3, data: [[0,0,0], [v[0], v[1], 0]] });
+view.line({ points: '#vpts', color: '#16c79a', width: 8 });
+view.array({ id: 'vtip', width: 1, channels: 3, data: [[v[0], v[1], 0]] });
+view.point({ points: '#vtip', color: '#16c79a', size: 20 });
+
+// Origin
+view.array({ id: 'origin', width: 1, channels: 3, data: [[0, 0, 0]] });
+view.point({ points: '#origin', color: '#ffffff', size: 12 });
+
+function update() {
+  v = [parseFloat(document.getElementById('vx').value), parseFloat(document.getElementById('vy').value)];
+  const mag = Math.sqrt(v[0]*v[0] + v[1]*v[1]);
+  
+  mathbox.select('#vpts').set('data', [[0,0,0], [v[0], v[1], 0]]);
+  mathbox.select('#vtip').set('data', [[v[0], v[1], 0]]);
+  mathbox.select('#xproj').set('data', [[v[0], 0, 0], [v[0], v[1], 0]]);
+  mathbox.select('#yproj').set('data', [[0, v[1], 0], [v[0], v[1], 0]]);
+  
+  document.getElementById('vx-val').textContent = fmt(v[0]);
+  document.getElementById('vy-val').textContent = fmt(v[1]);
+  document.getElementById('dx').textContent = fmt(v[0]);
+  document.getElementById('dy').textContent = fmt(v[1]);
+  document.getElementById('mag').textContent = fmt2(mag);
+}
+
+document.querySelectorAll('input[type="range"]').forEach(input => input.addEventListener('input', update));
+</script>
+</body>
+</html>

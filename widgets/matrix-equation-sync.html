@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Matrix-Equation Sync</title>
+  <style>
+    * { box-sizing: border-box; }
+    body { margin: 0; background: #1a1a2e; font-family: 'Segoe UI', sans-serif; color: #eee; padding: 20px; }
+    .container { max-width: 900px; margin: 0 auto; }
+    h2 { color: #16c79a; text-align: center; margin-bottom: 30px; }
+    .side-by-side { display: flex; gap: 40px; justify-content: center; align-items: flex-start; flex-wrap: wrap; }
+    .panel { background: rgba(255,255,255,0.05); border-radius: 12px; padding: 25px; min-width: 350px; }
+    .panel h3 { margin: 0 0 20px 0; color: #aaa; text-align: center; font-size: 14px; }
+    .equation-row { display: flex; align-items: center; margin: 12px 0; font-family: monospace; font-size: 18px; }
+    .equation-row input { width: 50px; text-align: center; background: #2a2a4a; border: 1px solid #444; color: #fff; padding: 6px; border-radius: 4px; font-size: 16px; margin: 0 2px; }
+    .equation-row span { margin: 0 4px; }
+    .var { color: #4d80e4; }
+    .equals { color: #16c79a; margin: 0 8px; }
+    .matrix-container { display: flex; align-items: center; justify-content: center; gap: 10px; }
+    .bracket { font-size: 50px; font-weight: 100; }
+    .matrix-grid { display: inline-grid; gap: 6px; }
+    .matrix-grid.aug { grid-template-columns: repeat(4, 45px); }
+    .cell { text-align: center; font-family: monospace; font-size: 16px; padding: 6px; border-radius: 4px; background: rgba(255,255,255,0.1); }
+    .cell.coef { background: #2a2a4a; }
+    .cell.const { background: rgba(22, 199, 154, 0.3); color: #16c79a; }
+    .divider { width: 2px; background: #16c79a; height: 100%; }
+    .sync-arrow { font-size: 30px; color: #f39c12; display: none; }
+    @media (max-width: 800px) { .sync-arrow { display: block; transform: rotate(90deg); margin: 20px auto; } }
+    @media (min-width: 801px) { .sync-arrow { display: block; } }
+    .info { text-align: center; margin-top: 20px; color: #888; font-size: 13px; }
+  </style>
+</head>
+<body>
+<div class="container">
+  <h2>System of Equations ↔ Augmented Matrix</h2>
+  
+  <div class="side-by-side">
+    <div class="panel">
+      <h3>SYSTEM OF EQUATIONS</h3>
+      <div class="equation-row">
+        <input type="number" id="a11" value="2">
+        <span class="var">x</span>
+        <span>+</span>
+        <input type="number" id="a12" value="3">
+        <span class="var">y</span>
+        <span>+</span>
+        <input type="number" id="a13" value="-1">
+        <span class="var">z</span>
+        <span class="equals">=</span>
+        <input type="number" id="b1" value="5">
+      </div>
+      <div class="equation-row">
+        <input type="number" id="a21" value="1">
+        <span class="var">x</span>
+        <span>+</span>
+        <input type="number" id="a22" value="-1">
+        <span class="var">y</span>
+        <span>+</span>
+        <input type="number" id="a23" value="2">
+        <span class="var">z</span>
+        <span class="equals">=</span>
+        <input type="number" id="b2" value="3">
+      </div>
+      <div class="equation-row">
+        <input type="number" id="a31" value="3">
+        <span class="var">x</span>
+        <span>+</span>
+        <input type="number" id="a32" value="2">
+        <span class="var">y</span>
+        <span>+</span>
+        <input type="number" id="a33" value="1">
+        <span class="var">z</span>
+        <span class="equals">=</span>
+        <input type="number" id="b3" value="10">
+      </div>
+    </div>
+    
+    <div class="sync-arrow">⟷</div>
+    
+    <div class="panel">
+      <h3>AUGMENTED MATRIX</h3>
+      <div class="matrix-container">
+        <span class="bracket">[</span>
+        <div class="matrix-grid aug" id="augMatrix">
+          <div class="cell coef" id="m11">2</div>
+          <div class="cell coef" id="m12">3</div>
+          <div class="cell coef" id="m13">-1</div>
+          <div class="cell const" id="m14">5</div>
+          <div class="cell coef" id="m21">1</div>
+          <div class="cell coef" id="m22">-1</div>
+          <div class="cell coef" id="m23">2</div>
+          <div class="cell const" id="m24">3</div>
+          <div class="cell coef" id="m31">3</div>
+          <div class="cell coef" id="m32">2</div>
+          <div class="cell coef" id="m33">1</div>
+          <div class="cell const" id="m34">10</div>
+        </div>
+        <span class="bracket">]</span>
+      </div>
+    </div>
+  </div>
+  
+  <div class="info">Edit any value on the left — the matrix updates instantly!</div>
+</div>
+
+<script>
+const mapping = [
+  ['a11', 'm11'], ['a12', 'm12'], ['a13', 'm13'], ['b1', 'm14'],
+  ['a21', 'm21'], ['a22', 'm22'], ['a23', 'm23'], ['b2', 'm24'],
+  ['a31', 'm31'], ['a32', 'm32'], ['a33', 'm33'], ['b3', 'm34']
+];
+
+function sync() {
+  mapping.forEach(([inputId, cellId]) => {
+    const val = document.getElementById(inputId).value;
+    document.getElementById(cellId).textContent = val;
+  });
+}
+
+document.querySelectorAll('input').forEach(input => {
+  input.addEventListener('input', sync);
+});
+</script>
+</body>
+</html>

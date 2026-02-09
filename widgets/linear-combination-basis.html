@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Linear Combination Explorer</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/mathbox@2.3.1/build/mathbox.css">
+  <style>
+    * { box-sizing: border-box; }
+    body { margin: 0; background: #1a1a2e; font-family: 'Segoe UI', sans-serif; color: #eee; }
+    .container { display: flex; width: 100%; height: 500px; }
+    .sidebar { width: 260px; min-width: 260px; background: #12121c; padding: 20px 15px; display: flex; flex-direction: column; gap: 15px; }
+    #mathbox { flex: 1; height: 100%; }
+    .vector-section { background: rgba(255,255,255,0.05); border-radius: 8px; padding: 12px; }
+    .vector-section h3 { margin: 0 0 10px 0; font-size: 14px; }
+    .vector-badge { display: inline-block; padding: 3px 10px; border-radius: 4px; font-weight: bold; font-size: 14px; }
+    .v1-badge { background: #e94560; }
+    .v2-badge { background: #4d80e4; }
+    .result-badge { background: #16c79a; }
+    .slider-row { display: flex; align-items: center; margin: 8px 0; gap: 10px; }
+    .slider-row label { width: 25px; font-size: 14px; color: #aaa; }
+    .slider-row input[type="range"] { flex: 1; }
+    .slider-row .value { width: 45px; text-align: right; font-size: 14px; font-family: monospace; }
+    .vector-display { display: flex; align-items: center; justify-content: center; gap: 10px; font-size: 16px; margin-top: 8px; }
+    .col-vector { display: inline-flex; flex-direction: column; align-items: center; border-left: 2px solid currentColor; border-right: 2px solid currentColor; padding: 2px 10px; border-radius: 3px; }
+    .col-vector span { line-height: 1.4; font-family: monospace; }
+    .v1-text { color: #e94560; }
+    .v2-text { color: #4d80e4; }
+    .result-text { color: #16c79a; }
+    .equation { text-align: center; font-size: 16px; padding: 10px; background: rgba(255,255,255,0.05); border-radius: 8px; }
+  </style>
+</head>
+<body>
+<div class="container">
+  <div class="sidebar">
+    <div class="vector-section">
+      <h3><span class="vector-badge v1-badge">e₁</span> = (1, 0)</h3>
+      <div class="slider-row">
+        <label>c₁:</label>
+        <input type="range" id="c1" min="-3" max="3" step="0.1" value="2">
+        <span class="value" id="c1-val">2.0</span>
+      </div>
+    </div>
+    <div class="vector-section">
+      <h3><span class="vector-badge v2-badge">e₂</span> = (0, 1)</h3>
+      <div class="slider-row">
+        <label>c₂:</label>
+        <input type="range" id="c2" min="-3" max="3" step="0.1" value="1">
+        <span class="value" id="c2-val">1.0</span>
+      </div>
+    </div>
+    <div class="equation">
+      <span class="v1-text" id="c1-display">2.0</span><span class="v1-text">·e₁</span> + 
+      <span class="v2-text" id="c2-display">1.0</span><span class="v2-text">·e₂</span> = 
+      <span class="result-text"><span id="rx">2.0</span>, <span id="ry">1.0</span></span>
+    </div>
+    <div class="vector-section">
+      <div class="vector-display result-text">
+        <strong>Result</strong> = 
+        <div class="col-vector"><span id="result-x">2.0</span><span id="result-y">1.0</span></div>
+      </div>
+    </div>
+  </div>
+  <div id="mathbox"></div>
+</div>
+<script src="https://cdn.jsdelivr.net/npm/three@0.137.0/build/three.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/three@0.137.0/examples/js/controls/OrbitControls.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/mathbox@2.3.1/build/bundle/mathbox.js"></script>
+<script>
+let c1 = 2, c2 = 1;
+const e1 = [1, 0, 0], e2 = [0, 1, 0];
+function fmt(n) { return Number(n).toFixed(1); }
+
+const mathbox = MathBox.mathBox({
+  element: document.getElementById('mathbox'),
+  plugins: ['core', 'controls', 'cursor'],
+  controls: { klass: THREE.OrbitControls },
+  camera: { fov: 45 },
+});
+mathbox.three.renderer.setClearColor(new THREE.Color('#1a1a2e'), 1.0);
+mathbox.camera({ proxy: true, position: [0, 0, 6] });
+
+const view = mathbox.cartesian({
+  range: [[-4, 4], [-4, 4], [-1, 1]],
+  scale: [2, 2, 1],
+});
+
+view.grid({ axes: [1, 2], width: 1, color: '#444', depth: 0.5 });
+view.axis({ axis: 1, width: 3, color: '#ffffff' });
+view.axis({ axis: 2, width: 3, color: '#ffffff' });
+
+// Axis labels
+view.array({ id: 'xlabels', width: 6, channels: 3, data: [[-3,-0.5,0],[-2,-0.5,0],[-1,-0.5,0],[1,-0.5,0],[2,-0.5,0],[3,-0.5,0]] });
+view.text({ data: ['-3','-2','-1','1','2','3'] });
+view.label({ points: '#xlabels', color: '#ffffff', background: '#1a1a2e', size: 16, depth: 0.5 });
+view.array({ id: 'ylabels', width: 6, channels: 3, data: [[-0.5,-3,0],[-0.5,-2,0],[-0.5,-1,0],[-0.5,1,0],[-0.5,2,0],[-0.5,3,0]] });
+view.text({ data: ['-3','-2','-1','1','2','3'] });
+view.label({ points: '#ylabels', color: '#ffffff', background: '#1a1a2e', size: 16, depth: 0.5 });
+
+// Basis vectors (faded)
+view.array({ id: 'e1pts', width: 2, channels: 3, data: [[0,0,0], e1] });
+view.line({ points: '#e1pts', color: '#e94560', width: 4, opacity: 0.3 });
+view.array({ id: 'e2pts', width: 2, channels: 3, data: [[0,0,0], e2] });
+view.line({ points: '#e2pts', color: '#4d80e4', width: 4, opacity: 0.3 });
+
+// Scaled vectors
+view.array({ id: 'v1pts', width: 2, channels: 3, data: [[0,0,0], [c1,0,0]] });
+view.line({ points: '#v1pts', color: '#e94560', width: 8 });
+view.array({ id: 'v1tip', width: 1, channels: 3, data: [[c1,0,0]] });
+view.point({ points: '#v1tip', color: '#e94560', size: 16 });
+
+view.array({ id: 'v2pts', width: 2, channels: 3, data: [[c1,0,0], [c1,c2,0]] });
+view.line({ points: '#v2pts', color: '#4d80e4', width: 8 });
+view.array({ id: 'v2tip', width: 1, channels: 3, data: [[c1,c2,0]] });
+view.point({ points: '#v2tip', color: '#4d80e4', size: 16 });
+
+// Result
+view.array({ id: 'respts', width: 2, channels: 3, data: [[0,0,0], [c1,c2,0]] });
+view.line({ points: '#respts', color: '#16c79a', width: 8 });
+view.array({ id: 'restip', width: 1, channels: 3, data: [[c1,c2,0]] });
+view.point({ points: '#restip', color: '#16c79a', size: 20 });
+
+function update() {
+  c1 = parseFloat(document.getElementById('c1').value);
+  c2 = parseFloat(document.getElementById('c2').value);
+  
+  mathbox.select('#v1pts').set('data', [[0,0,0], [c1,0,0]]);
+  mathbox.select('#v1tip').set('data', [[c1,0,0]]);
+  mathbox.select('#v2pts').set('data', [[c1,0,0], [c1,c2,0]]);
+  mathbox.select('#v2tip').set('data', [[c1,c2,0]]);
+  mathbox.select('#respts').set('data', [[0,0,0], [c1,c2,0]]);
+  mathbox.select('#restip').set('data', [[c1,c2,0]]);
+  
+  document.getElementById('c1-val').textContent = fmt(c1);
+  document.getElementById('c2-val').textContent = fmt(c2);
+  document.getElementById('c1-display').textContent = fmt(c1);
+  document.getElementById('c2-display').textContent = fmt(c2);
+  document.getElementById('rx').textContent = fmt(c1);
+  document.getElementById('ry').textContent = fmt(c2);
+  document.getElementById('result-x').textContent = fmt(c1);
+  document.getElementById('result-y').textContent = fmt(c2);
+}
+
+document.querySelectorAll('input[type="range"]').forEach(input => {
+  input.addEventListener('input', update);
+});
+</script>
+</body>
+</html>

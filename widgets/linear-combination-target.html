@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Linear Combination Target</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/mathbox@2.3.1/build/mathbox.css">
+  <style>
+    * { box-sizing: border-box; }
+    body { margin: 0; background: #1a1a2e; font-family: 'Segoe UI', sans-serif; color: #eee; }
+    .container { display: flex; width: 100%; height: 500px; }
+    .sidebar { width: 280px; min-width: 280px; background: #12121c; padding: 20px 15px; display: flex; flex-direction: column; gap: 12px; overflow-y: auto; }
+    #mathbox { flex: 1; height: 100%; }
+    .section { background: rgba(255,255,255,0.05); border-radius: 8px; padding: 12px; }
+    .section h3 { margin: 0 0 8px 0; font-size: 14px; color: #aaa; }
+    .badge { display: inline-block; padding: 3px 10px; border-radius: 4px; font-weight: bold; font-size: 12px; }
+    .v1-b { background: #e94560; }
+    .v2-b { background: #4d80e4; }
+    .v3-b { background: #9b59b6; }
+    .target-b { background: #f39c12; }
+    .result-b { background: #16c79a; }
+    .slider-row { display: flex; align-items: center; margin: 6px 0; gap: 8px; }
+    .slider-row label { width: 25px; font-size: 13px; color: #aaa; }
+    .slider-row input[type="range"] { flex: 1; }
+    .slider-row .value { width: 40px; text-align: right; font-size: 13px; font-family: monospace; }
+    .vector-display { display: flex; align-items: center; justify-content: center; gap: 8px; font-size: 14px; margin-top: 6px; }
+    .col-vector { display: inline-flex; flex-direction: column; align-items: center; border-left: 2px solid currentColor; border-right: 2px solid currentColor; padding: 2px 8px; border-radius: 3px; }
+    .col-vector span { line-height: 1.3; font-family: monospace; font-size: 13px; }
+    .v1-t { color: #e94560; }
+    .v2-t { color: #4d80e4; }
+    .v3-t { color: #9b59b6; }
+    .target-t { color: #f39c12; }
+    .result-t { color: #16c79a; }
+    .match { background: rgba(22, 199, 154, 0.3); border: 2px solid #16c79a; }
+    .status { text-align: center; padding: 10px; border-radius: 8px; font-weight: bold; }
+  </style>
+</head>
+<body>
+<div class="container">
+  <div class="sidebar">
+    <div class="section">
+      <h3>Target Vector</h3>
+      <div class="vector-display target-t"><span class="badge target-b">b</span> = <div class="col-vector"><span>4</span><span>7</span></div></div>
+    </div>
+    <div class="section">
+      <h3>Coefficients</h3>
+      <div class="slider-row"><label class="v1-t">x₁:</label><input type="range" id="x1" min="-3" max="5" step="0.1" value="2"><span class="value" id="x1-val">2.0</span></div>
+      <div class="slider-row"><label class="v2-t">x₂:</label><input type="range" id="x2" min="-3" max="5" step="0.1" value="1"><span class="value" id="x2-val">1.0</span></div>
+      <div class="slider-row"><label class="v3-t">x₃:</label><input type="range" id="x3" min="-3" max="5" step="0.1" value="0"><span class="value" id="x3-val">0.0</span></div>
+    </div>
+    <div class="section">
+      <div style="font-size: 13px; text-align: center; margin-bottom: 8px;">
+        <span class="v1-t" id="x1d">2.0</span><span class="v1-t">·v₁</span> + 
+        <span class="v2-t" id="x2d">1.0</span><span class="v2-t">·v₂</span> + 
+        <span class="v3-t" id="x3d">0.0</span><span class="v3-t">·v₃</span>
+      </div>
+      <div class="vector-display result-t"><strong>Result</strong> = <div class="col-vector"><span id="rx">4</span><span id="ry">7</span></div></div>
+    </div>
+    <div class="section status" id="status">Adjust to hit the target!</div>
+  </div>
+  <div id="mathbox"></div>
+</div>
+<script src="https://cdn.jsdelivr.net/npm/three@0.137.0/build/three.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/three@0.137.0/examples/js/controls/OrbitControls.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/mathbox@2.3.1/build/bundle/mathbox.js"></script>
+<script>
+const v1 = [1, 2], v2 = [2, 3], v3 = [1, 1];
+const target = [4, 7];
+let x1 = 2, x2 = 1, x3 = 0;
+function fmt(n) { return Number(n).toFixed(1); }
+
+const mathbox = MathBox.mathBox({
+  element: document.getElementById('mathbox'),
+  plugins: ['core', 'controls', 'cursor'],
+  controls: { klass: THREE.OrbitControls },
+  camera: { fov: 45 },
+});
+mathbox.three.renderer.setClearColor(new THREE.Color('#1a1a2e'), 1.0);
+mathbox.camera({ proxy: true, position: [0, 0, 8] });
+
+const view = mathbox.cartesian({ range: [[-2, 8], [-2, 10], [-1, 1]], scale: [2, 2, 1] });
+view.grid({ axes: [1, 2], width: 1, color: '#444', depth: 0.5 });
+view.axis({ axis: 1, width: 3, color: '#ffffff' });
+view.axis({ axis: 2, width: 3, color: '#ffffff' });
+
+// v1, v2, v3 base vectors (faded)
+view.array({ id: 'v1b', width: 2, channels: 3, data: [[0,0,0], [v1[0],v1[1],0]] });
+view.line({ points: '#v1b', color: '#e94560', width: 4, opacity: 0.4 });
+view.array({ id: 'v2b', width: 2, channels: 3, data: [[0,0,0], [v2[0],v2[1],0]] });
+view.line({ points: '#v2b', color: '#4d80e4', width: 4, opacity: 0.4 });
+view.array({ id: 'v3b', width: 2, channels: 3, data: [[0,0,0], [v3[0],v3[1],0]] });
+view.line({ points: '#v3b', color: '#9b59b6', width: 4, opacity: 0.4 });
+
+// target
+view.array({ id: 'tgt', width: 1, channels: 3, data: [[target[0], target[1], 0]] });
+view.point({ points: '#tgt', color: '#f39c12', size: 30 });
+
+// result
+let result = [x1*v1[0]+x2*v2[0]+x3*v3[0], x1*v1[1]+x2*v2[1]+x3*v3[1]];
+view.array({ id: 'respts', width: 2, channels: 3, data: [[0,0,0], [result[0],result[1],0]] });
+view.line({ points: '#respts', color: '#16c79a', width: 8 });
+view.array({ id: 'restip', width: 1, channels: 3, data: [[result[0],result[1],0]] });
+view.point({ points: '#restip', color: '#16c79a', size: 20 });
+
+function update() {
+  x1 = parseFloat(document.getElementById('x1').value);
+  x2 = parseFloat(document.getElementById('x2').value);
+  x3 = parseFloat(document.getElementById('x3').value);
+  result = [x1*v1[0]+x2*v2[0]+x3*v3[0], x1*v1[1]+x2*v2[1]+x3*v3[1]];
+  
+  mathbox.select('#respts').set('data', [[0,0,0], [result[0],result[1],0]]);
+  mathbox.select('#restip').set('data', [[result[0],result[1],0]]);
+  
+  document.getElementById('x1-val').textContent = fmt(x1);
+  document.getElementById('x2-val').textContent = fmt(x2);
+  document.getElementById('x3-val').textContent = fmt(x3);
+  document.getElementById('x1d').textContent = fmt(x1);
+  document.getElementById('x2d').textContent = fmt(x2);
+  document.getElementById('x3d').textContent = fmt(x3);
+  document.getElementById('rx').textContent = fmt(result[0]);
+  document.getElementById('ry').textContent = fmt(result[1]);
+  
+  const dist = Math.sqrt((result[0]-target[0])**2 + (result[1]-target[1])**2);
+  const status = document.getElementById('status');
+  if (dist < 0.15) {
+    status.textContent = '✓ Target reached!';
+    status.className = 'section status match';
+  } else {
+    status.textContent = 'Adjust to hit the target!';
+    status.className = 'section status';
+  }
+}
+
+document.querySelectorAll('input[type="range"]').forEach(input => input.addEventListener('input', update));
+</script>
+</body>
+</html>

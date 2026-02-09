@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Matrix Composition</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/mathbox@2.3.1/build/mathbox.css">
+  <style>
+    * { box-sizing: border-box; }
+    body { margin: 0; background: #1a1a2e; font-family: 'Segoe UI', sans-serif; color: #eee; }
+    .container { display: flex; width: 100%; height: 500px; }
+    .sidebar { width: 300px; min-width: 300px; background: #12121c; padding: 15px; display: flex; flex-direction: column; gap: 10px; overflow-y: auto; }
+    #mathbox { flex: 1; height: 100%; }
+    .section { background: rgba(255,255,255,0.05); border-radius: 8px; padding: 10px; }
+    .section h3 { margin: 0 0 8px 0; font-size: 13px; color: #aaa; }
+    .matrix-row { display: flex; align-items: center; justify-content: center; gap: 5px; margin: 5px 0; }
+    .matrix-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 4px; }
+    .matrix-grid input { width: 40px; padding: 4px; text-align: center; background: #2a2a4a; border: 1px solid #444; color: #fff; border-radius: 4px; font-size: 12px; }
+    .bracket { font-size: 30px; font-weight: 100; }
+    .equals { font-size: 20px; margin: 0 8px; }
+    .result-matrix { display: inline-grid; grid-template-columns: 1fr 1fr; gap: 4px 10px; font-family: monospace; font-size: 14px; }
+    .a-color { color: #e94560; }
+    .b-color { color: #4d80e4; }
+    .ab-color { color: #16c79a; }
+    .preset-btn { padding: 6px 10px; margin: 2px; background: #2a2a4a; border: none; color: #fff; border-radius: 4px; cursor: pointer; font-size: 11px; }
+    .preset-btn:hover { background: #3a3a5a; }
+    .info { font-size: 11px; color: #888; text-align: center; }
+  </style>
+</head>
+<body>
+<div class="container">
+  <div class="sidebar">
+    <div class="section">
+      <h3 class="a-color">Matrix A (apply first)</h3>
+      <div class="matrix-row">
+        <span class="bracket">[</span>
+        <div class="matrix-grid">
+          <input type="number" id="a11" value="1" step="0.5">
+          <input type="number" id="a12" value="0" step="0.5">
+          <input type="number" id="a21" value="0" step="0.5">
+          <input type="number" id="a22" value="1" step="0.5">
+        </div>
+        <span class="bracket">]</span>
+      </div>
+      <div style="text-align:center;">
+        <button class="preset-btn" onclick="setA(0,-1,1,0)">Rot 90°</button>
+        <button class="preset-btn" onclick="setA(1,0.5,0,1)">Shear</button>
+        <button class="preset-btn" onclick="setA(2,0,0,2)">Scale</button>
+      </div>
+    </div>
+    <div class="section">
+      <h3 class="b-color">Matrix B (apply second)</h3>
+      <div class="matrix-row">
+        <span class="bracket">[</span>
+        <div class="matrix-grid">
+          <input type="number" id="b11" value="1" step="0.5">
+          <input type="number" id="b12" value="0" step="0.5">
+          <input type="number" id="b21" value="0" step="0.5">
+          <input type="number" id="b22" value="1" step="0.5">
+        </div>
+        <span class="bracket">]</span>
+      </div>
+      <div style="text-align:center;">
+        <button class="preset-btn" onclick="setB(0,-1,1,0)">Rot 90°</button>
+        <button class="preset-btn" onclick="setB(-1,0,0,1)">Reflect</button>
+        <button class="preset-btn" onclick="setB(0.5,0,0,0.5)">Shrink</button>
+      </div>
+    </div>
+    <div class="section">
+      <h3 class="ab-color">Combined: BA (B after A)</h3>
+      <div class="matrix-row">
+        <span class="bracket">[</span>
+        <div class="result-matrix ab-color">
+          <span id="ba11">1</span><span id="ba12">0</span>
+          <span id="ba21">0</span><span id="ba22">1</span>
+        </div>
+        <span class="bracket">]</span>
+      </div>
+      <div class="info">BA means: first A, then B</div>
+    </div>
+  </div>
+  <div id="mathbox"></div>
+</div>
+<script src="https://cdn.jsdelivr.net/npm/three@0.137.0/build/three.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/three@0.137.0/examples/js/controls/OrbitControls.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/mathbox@2.3.1/build/bundle/mathbox.js"></script>
+<script>
+let A = [[1,0],[0,1]], B = [[1,0],[0,1]];
+function fmt(n) { return Number(n).toFixed(1); }
+function mult(M, N) {
+  return [
+    [M[0][0]*N[0][0]+M[0][1]*N[1][0], M[0][0]*N[0][1]+M[0][1]*N[1][1]],
+    [M[1][0]*N[0][0]+M[1][1]*N[1][0], M[1][0]*N[0][1]+M[1][1]*N[1][1]]
+  ];
+}
+function transform(M, p) {
+  return [M[0][0]*p[0]+M[0][1]*p[1], M[1][0]*p[0]+M[1][1]*p[1], 0];
+}
+
+const mathbox = MathBox.mathBox({
+  element: document.getElementById('mathbox'),
+  plugins: ['core', 'controls', 'cursor'],
+  controls: { klass: THREE.OrbitControls },
+  camera: { fov: 45 },
+});
+mathbox.three.renderer.setClearColor(new THREE.Color('#1a1a2e'), 1.0);
+mathbox.camera({ proxy: true, position: [0, 0, 6] });
+
+const view = mathbox.cartesian({ range: [[-4, 4], [-4, 4], [-1, 1]], scale: [2, 2, 1] });
+view.grid({ axes: [1, 2], width: 1, color: '#333', depth: 0.5 });
+view.axis({ axis: 1, width: 2, color: '#555' });
+view.axis({ axis: 2, width: 2, color: '#555' });
+
+// Original unit square
+const sq = [[0,0,0],[1,0,0],[1,1,0],[0,1,0],[0,0,0]];
+
+// After A (red, faded)
+view.array({ id: 'sqA', width: 5, channels: 3, data: sq.map(p => transform(A, p)) });
+view.line({ points: '#sqA', color: '#e94560', width: 4, opacity: 0.5 });
+
+// After BA (green)
+view.array({ id: 'sqBA', width: 5, channels: 3, data: sq.map(p => transform(mult(B,A), p)) });
+view.line({ points: '#sqBA', color: '#16c79a', width: 6 });
+
+// Basis vectors after BA
+let BA = mult(B, A);
+view.array({ id: 'e1ba', width: 2, channels: 3, data: [[0,0,0], [BA[0][0], BA[1][0], 0]] });
+view.line({ points: '#e1ba', color: '#16c79a', width: 8 });
+view.array({ id: 'e1batip', width: 1, channels: 3, data: [[BA[0][0], BA[1][0], 0]] });
+view.point({ points: '#e1batip', color: '#16c79a', size: 16 });
+
+view.array({ id: 'e2ba', width: 2, channels: 3, data: [[0,0,0], [BA[0][1], BA[1][1], 0]] });
+view.line({ points: '#e2ba', color: '#16c79a', width: 8 });
+view.array({ id: 'e2batip', width: 1, channels: 3, data: [[BA[0][1], BA[1][1], 0]] });
+view.point({ points: '#e2batip', color: '#16c79a', size: 16 });
+
+function update() {
+  A = [
+    [parseFloat(document.getElementById('a11').value), parseFloat(document.getElementById('a12').value)],
+    [parseFloat(document.getElementById('a21').value), parseFloat(document.getElementById('a22').value)]
+  ];
+  B = [
+    [parseFloat(document.getElementById('b11').value), parseFloat(document.getElementById('b12').value)],
+    [parseFloat(document.getElementById('b21').value), parseFloat(document.getElementById('b22').value)]
+  ];
+  BA = mult(B, A);
+  
+  mathbox.select('#sqA').set('data', sq.map(p => transform(A, p)));
+  mathbox.select('#sqBA').set('data', sq.map(p => transform(BA, p)));
+  mathbox.select('#e1ba').set('data', [[0,0,0], [BA[0][0], BA[1][0], 0]]);
+  mathbox.select('#e1batip').set('data', [[BA[0][0], BA[1][0], 0]]);
+  mathbox.select('#e2ba').set('data', [[0,0,0], [BA[0][1], BA[1][1], 0]]);
+  mathbox.select('#e2batip').set('data', [[BA[0][1], BA[1][1], 0]]);
+  
+  document.getElementById('ba11').textContent = fmt(BA[0][0]);
+  document.getElementById('ba12').textContent = fmt(BA[0][1]);
+  document.getElementById('ba21').textContent = fmt(BA[1][0]);
+  document.getElementById('ba22').textContent = fmt(BA[1][1]);
+}
+
+function setA(a,b,c,d) {
+  document.getElementById('a11').value=a; document.getElementById('a12').value=b;
+  document.getElementById('a21').value=c; document.getElementById('a22').value=d;
+  update();
+}
+function setB(a,b,c,d) {
+  document.getElementById('b11').value=a; document.getElementById('b12').value=b;
+  document.getElementById('b21').value=c; document.getElementById('b22').value=d;
+  update();
+}
+
+document.querySelectorAll('input').forEach(input => input.addEventListener('input', update));
+</script>
+</body>
+</html>

@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Transformation Grid</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/mathbox@2.3.1/build/mathbox.css">
+  <style>
+    * { box-sizing: border-box; }
+    body { margin: 0; background: #1a1a2e; font-family: 'Segoe UI', sans-serif; color: #eee; }
+    .container { display: flex; width: 100%; height: 500px; }
+    .sidebar { width: 280px; min-width: 280px; background: #12121c; padding: 20px 15px; display: flex; flex-direction: column; gap: 12px; }
+    #mathbox { flex: 1; height: 100%; }
+    .section { background: rgba(255,255,255,0.05); border-radius: 8px; padding: 12px; }
+    .section h3 { margin: 0 0 10px 0; font-size: 14px; color: #aaa; }
+    .matrix-display { display: flex; justify-content: center; align-items: center; gap: 5px; font-size: 18px; font-family: monospace; }
+    .matrix-bracket { font-size: 40px; font-weight: 100; }
+    .matrix-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+    .matrix-grid input { width: 50px; padding: 5px; text-align: center; background: #2a2a4a; border: 1px solid #444; color: #fff; border-radius: 4px; font-size: 14px; }
+    .preset-btn { width: 100%; padding: 8px; margin: 4px 0; background: #2a2a4a; border: none; color: #fff; border-radius: 4px; cursor: pointer; font-size: 13px; }
+    .preset-btn:hover { background: #3a3a5a; }
+    .basis-info { font-size: 12px; margin-top: 10px; }
+    .e1 { color: #e94560; }
+    .e2 { color: #4d80e4; }
+  </style>
+</head>
+<body>
+<div class="container">
+  <div class="sidebar">
+    <div class="section">
+      <h3>Transformation Matrix A</h3>
+      <div class="matrix-display">
+        <span class="matrix-bracket">[</span>
+        <div class="matrix-grid">
+          <input type="number" id="a" value="1" step="0.1">
+          <input type="number" id="b" value="0" step="0.1">
+          <input type="number" id="c" value="0" step="0.1">
+          <input type="number" id="d" value="1" step="0.1">
+        </div>
+        <span class="matrix-bracket">]</span>
+      </div>
+      <div class="basis-info">
+        <div><span class="e1">e₁ → (</span><span class="e1" id="e1x">1</span>, <span class="e1" id="e1y">0</span><span class="e1">)</span></div>
+        <div><span class="e2">e₂ → (</span><span class="e2" id="e2x">0</span>, <span class="e2" id="e2y">1</span><span class="e2">)</span></div>
+      </div>
+    </div>
+    <div class="section">
+      <h3>Presets</h3>
+      <button class="preset-btn" onclick="setMatrix(1,0,0,1)">Identity</button>
+      <button class="preset-btn" onclick="setMatrix(2,0,0,2)">Scale 2×</button>
+      <button class="preset-btn" onclick="setMatrix(1,0.5,0,1)">Shear X</button>
+      <button class="preset-btn" onclick="setMatrix(0,-1,1,0)">Rotate 90°</button>
+      <button class="preset-btn" onclick="setMatrix(-1,0,0,1)">Reflect Y-axis</button>
+      <button class="preset-btn" onclick="setMatrix(1,0,0,-1)">Reflect X-axis</button>
+      <button class="preset-btn" onclick="setMatrix(0.5,0,0,1)">Compress X</button>
+    </div>
+  </div>
+  <div id="mathbox"></div>
+</div>
+<script src="https://cdn.jsdelivr.net/npm/three@0.137.0/build/three.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/three@0.137.0/examples/js/controls/OrbitControls.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/mathbox@2.3.1/build/bundle/mathbox.js"></script>
+<script>
+let A = [[1,0],[0,1]];
+
+const mathbox = MathBox.mathBox({
+  element: document.getElementById('mathbox'),
+  plugins: ['core', 'controls', 'cursor'],
+  controls: { klass: THREE.OrbitControls },
+  camera: { fov: 45 },
+});
+mathbox.three.renderer.setClearColor(new THREE.Color('#1a1a2e'), 1.0);
+mathbox.camera({ proxy: true, position: [0, 0, 6] });
+
+const view = mathbox.cartesian({ range: [[-4, 4], [-4, 4], [-1, 1]], scale: [2, 2, 1] });
+
+// Original grid (faded)
+view.grid({ axes: [1, 2], width: 1, color: '#333', depth: 0.5 });
+view.axis({ axis: 1, width: 2, color: '#555' });
+view.axis({ axis: 2, width: 2, color: '#555' });
+
+// Generate grid points
+function generateGrid() {
+  const pts = [];
+  for (let i = -3; i <= 3; i++) {
+    for (let j = -3; j <= 3; j++) {
+      pts.push([i, j, 0]);
+    }
+  }
+  return pts;
+}
+
+function transformPoint(p) {
+  return [A[0][0]*p[0] + A[0][1]*p[1], A[1][0]*p[0] + A[1][1]*p[1], 0];
+}
+
+function generateTransformedGrid() {
+  return generateGrid().map(transformPoint);
+}
+
+// Grid points
+view.array({ id: 'gridpts', width: 49, channels: 3, data: generateTransformedGrid() });
+view.point({ points: '#gridpts', color: '#16c79a', size: 8 });
+
+// Transformed e1 (column 1)
+view.array({ id: 'e1pts', width: 2, channels: 3, data: [[0,0,0], [A[0][0], A[1][0], 0]] });
+view.line({ points: '#e1pts', color: '#e94560', width: 8 });
+view.array({ id: 'e1tip', width: 1, channels: 3, data: [[A[0][0], A[1][0], 0]] });
+view.point({ points: '#e1tip', color: '#e94560', size: 20 });
+
+// Transformed e2 (column 2)
+view.array({ id: 'e2pts', width: 2, channels: 3, data: [[0,0,0], [A[0][1], A[1][1], 0]] });
+view.line({ points: '#e2pts', color: '#4d80e4', width: 8 });
+view.array({ id: 'e2tip', width: 1, channels: 3, data: [[A[0][1], A[1][1], 0]] });
+view.point({ points: '#e2tip', color: '#4d80e4', size: 20 });
+
+// Horizontal grid lines
+for (let i = -3; i <= 3; i++) {
+  const pts = [];
+  for (let j = -3; j <= 3; j++) {
+    pts.push(transformPoint([j, i, 0]));
+  }
+  view.array({ id: 'hline'+i, width: 7, channels: 3, data: pts });
+  view.line({ points: '#hline'+i, color: '#16c79a', width: 2, opacity: 0.5 });
+}
+
+// Vertical grid lines
+for (let i = -3; i <= 3; i++) {
+  const pts = [];
+  for (let j = -3; j <= 3; j++) {
+    pts.push(transformPoint([i, j, 0]));
+  }
+  view.array({ id: 'vline'+i, width: 7, channels: 3, data: pts });
+  view.line({ points: '#vline'+i, color: '#16c79a', width: 2, opacity: 0.5 });
+}
+
+function update() {
+  A = [
+    [parseFloat(document.getElementById('a').value), parseFloat(document.getElementById('b').value)],
+    [parseFloat(document.getElementById('c').value), parseFloat(document.getElementById('d').value)]
+  ];
+  
+  mathbox.select('#gridpts').set('data', generateTransformedGrid());
+  mathbox.select('#e1pts').set('data', [[0,0,0], [A[0][0], A[1][0], 0]]);
+  mathbox.select('#e1tip').set('data', [[A[0][0], A[1][0], 0]]);
+  mathbox.select('#e2pts').set('data', [[0,0,0], [A[0][1], A[1][1], 0]]);
+  mathbox.select('#e2tip').set('data', [[A[0][1], A[1][1], 0]]);
+  
+  // Update grid lines
+  for (let i = -3; i <= 3; i++) {
+    const hpts = [], vpts = [];
+    for (let j = -3; j <= 3; j++) {
+      hpts.push(transformPoint([j, i, 0]));
+      vpts.push(transformPoint([i, j, 0]));
+    }
+    mathbox.select('#hline'+i).set('data', hpts);
+    mathbox.select('#vline'+i).set('data', vpts);
+  }
+  
+  document.getElementById('e1x').textContent = A[0][0];
+  document.getElementById('e1y').textContent = A[1][0];
+  document.getElementById('e2x').textContent = A[0][1];
+  document.getElementById('e2y').textContent = A[1][1];
+}
+
+function setMatrix(a, b, c, d) {
+  document.getElementById('a').value = a;
+  document.getElementById('b').value = b;
+  document.getElementById('c').value = c;
+  document.getElementById('d').value = d;
+  update();
+}
+
+document.querySelectorAll('input').forEach(input => input.addEventListener('input', update));
+</script>
+</body>
+</html>

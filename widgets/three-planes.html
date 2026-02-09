@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Three Planes Intersection</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/mathbox@2.3.1/build/mathbox.css">
+  <style>
+    * { box-sizing: border-box; }
+    body { margin: 0; background: #1a1a2e; font-family: 'Segoe UI', sans-serif; color: #eee; }
+    .container { display: flex; width: 100%; height: 500px; }
+    .sidebar { width: 280px; min-width: 280px; background: #12121c; padding: 15px; display: flex; flex-direction: column; gap: 10px; overflow-y: auto; }
+    #mathbox { flex: 1; height: 100%; }
+    .section { background: rgba(255,255,255,0.05); border-radius: 8px; padding: 10px; }
+    .section h3 { margin: 0 0 8px 0; font-size: 13px; }
+    .p1 { color: #e94560; }
+    .p2 { color: #4d80e4; }
+    .p3 { color: #16c79a; }
+    .preset-btn { width: 100%; padding: 10px; margin: 4px 0; background: #2a2a4a; border: none; color: #fff; border-radius: 6px; cursor: pointer; font-size: 12px; text-align: left; }
+    .preset-btn:hover { background: #3a3a5a; }
+    .result { text-align: center; padding: 12px; border-radius: 8px; font-size: 14px; margin-top: auto; }
+    .one-sol { background: rgba(22, 199, 154, 0.3); border: 2px solid #16c79a; }
+    .line-sol { background: rgba(241, 196, 15, 0.3); border: 2px solid #f1c40f; }
+    .no-sol { background: rgba(231, 76, 60, 0.3); border: 2px solid #e74c3c; }
+    .info { font-size: 11px; color: #888; text-align: center; }
+  </style>
+</head>
+<body>
+<div class="container">
+  <div class="sidebar">
+    <div class="section">
+      <h3>Presets</h3>
+      <button class="preset-btn" onclick="setPreset('point')">✓ One point (unique solution)</button>
+      <button class="preset-btn" onclick="setPreset('line')">↔ Line of solutions (∞)</button>
+      <button class="preset-btn" onclick="setPreset('parallel')">✗ Parallel planes (no solution)</button>
+      <button class="preset-btn" onclick="setPreset('triangle')">✗ Triangle pattern (no solution)</button>
+    </div>
+    <div class="section">
+      <h3 class="p1">Plane 1: ax + by + cz = d</h3>
+      <div class="info">z = 0</div>
+    </div>
+    <div class="section">
+      <h3 class="p2">Plane 2: ax + by + cz = d</h3>
+      <div class="info">y = 0</div>
+    </div>
+    <div class="section">
+      <h3 class="p3">Plane 3: ax + by + cz = d</h3>
+      <div class="info">x = 0</div>
+    </div>
+    <div class="section result one-sol" id="result">
+      Intersect at one point: (0, 0, 0)
+    </div>
+  </div>
+  <div id="mathbox"></div>
+</div>
+<script src="https://cdn.jsdelivr.net/npm/three@0.137.0/build/three.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/three@0.137.0/examples/js/controls/OrbitControls.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/mathbox@2.3.1/build/bundle/mathbox.js"></script>
+<script>
+let preset = 'point';
+
+const mathbox = MathBox.mathBox({
+  element: document.getElementById('mathbox'),
+  plugins: ['core', 'controls', 'cursor'],
+  controls: { klass: THREE.OrbitControls },
+  camera: { fov: 45 },
+});
+mathbox.three.renderer.setClearColor(new THREE.Color('#1a1a2e'), 1.0);
+mathbox.camera({ proxy: true, position: [3, 2, 4] });
+
+const view = mathbox.cartesian({ range: [[-2, 2], [-2, 2], [-2, 2]], scale: [1.5, 1.5, 1.5] });
+view.axis({ axis: 1, width: 2, color: '#666' });
+view.axis({ axis: 2, width: 2, color: '#666' });
+view.axis({ axis: 3, width: 2, color: '#666' });
+
+// Plane functions (simplified)
+function createPlaneGrid(fn, id, color) {
+  const pts = [];
+  for (let u = -2; u <= 2; u += 0.5) {
+    for (let v = -2; v <= 2; v += 0.5) {
+      pts.push(fn(u, v));
+    }
+  }
+  view.array({ id: id+'pts', width: pts.length, channels: 3, data: pts });
+  view.point({ points: '#'+id+'pts', color: color, size: 4, opacity: 0.5 });
+}
+
+// z = 0 (red)
+view.array({ id: 'p1', width: 4, channels: 3, data: [[-2,-2,0],[-2,2,0],[2,2,0],[2,-2,0]] });
+view.surface({ points: '#p1', color: '#e94560', opacity: 0.3, shaded: false });
+
+// y = 0 (blue)
+view.array({ id: 'p2', width: 4, channels: 3, data: [[-2,0,-2],[-2,0,2],[2,0,2],[2,0,-2]] });
+view.surface({ points: '#p2', color: '#4d80e4', opacity: 0.3, shaded: false });
+
+// x = 0 (green)
+view.array({ id: 'p3', width: 4, channels: 3, data: [[0,-2,-2],[0,-2,2],[0,2,2],[0,2,-2]] });
+view.surface({ points: '#p3', color: '#16c79a', opacity: 0.3, shaded: false });
+
+// Intersection point
+view.array({ id: 'intpt', width: 1, channels: 3, data: [[0,0,0]] });
+view.point({ points: '#intpt', color: '#ffffff', size: 20 });
+
+// Intersection line (hidden by default)
+view.array({ id: 'intline', width: 2, channels: 3, data: [[0,0,-2],[0,0,2]] });
+view.line({ id: 'intlineshape', points: '#intline', color: '#f1c40f', width: 6, opacity: 0 });
+
+function setPreset(p) {
+  preset = p;
+  const result = document.getElementById('result');
+  
+  if (p === 'point') {
+    mathbox.select('#p1').set('data', [[-2,-2,0],[-2,2,0],[2,2,0],[2,-2,0]]);
+    mathbox.select('#p2').set('data', [[-2,0,-2],[-2,0,2],[2,0,2],[2,0,-2]]);
+    mathbox.select('#p3').set('data', [[0,-2,-2],[0,-2,2],[0,2,2],[0,2,-2]]);
+    mathbox.select('#intpt').set('data', [[0,0,0]]);
+    mathbox.select('#intlineshape').set('opacity', 0);
+    result.textContent = 'Intersect at one point: (0, 0, 0)';
+    result.className = 'section result one-sol';
+  } else if (p === 'line') {
+    mathbox.select('#p1').set('data', [[-2,-2,0],[-2,2,0],[2,2,0],[2,-2,0]]);
+    mathbox.select('#p2').set('data', [[-2,-2,0],[-2,2,0],[2,2,0],[2,-2,0]]);
+    mathbox.select('#p3').set('data', [[0,-2,-2],[0,-2,2],[0,2,2],[0,2,-2]]);
+    mathbox.select('#intpt').set('data', [[100,100,100]]);
+    mathbox.select('#intline').set('data', [[0,-2,0],[0,2,0]]);
+    mathbox.select('#intlineshape').set('opacity', 1);
+    result.textContent = 'Intersect along a line (∞ solutions)';
+    result.className = 'section result line-sol';
+  } else if (p === 'parallel') {
+    mathbox.select('#p1').set('data', [[-2,-2,0],[-2,2,0],[2,2,0],[2,-2,0]]);
+    mathbox.select('#p2').set('data', [[-2,-2,1],[-2,2,1],[2,2,1],[2,-2,1]]);
+    mathbox.select('#p3').set('data', [[-2,-2,2],[-2,2,2],[2,2,2],[2,-2,2]]);
+    mathbox.select('#intpt').set('data', [[100,100,100]]);
+    mathbox.select('#intlineshape').set('opacity', 0);
+    result.textContent = 'Parallel planes — no intersection!';
+    result.className = 'section result no-sol';
+  } else if (p === 'triangle') {
+    mathbox.select('#p1').set('data', [[-2,-2,0],[-2,2,0],[2,2,0],[2,-2,0]]);
+    mathbox.select('#p2').set('data', [[-2,0,-2],[-2,0,2],[2,0,2],[2,0,-2]]);
+    mathbox.select('#p3').set('data', [[-2,-2,1],[-2,2,1],[2,2,1],[2,-2,1]]);
+    mathbox.select('#intpt').set('data', [[100,100,100]]);
+    mathbox.select('#intlineshape').set('opacity', 0);
+    result.textContent = 'Pairwise intersect but no common point!';
+    result.className = 'section result no-sol';
+  }
+}
+</script>
+</body>
+</html>

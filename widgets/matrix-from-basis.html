@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Matrix from Basis Vectors</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/mathbox@2.3.1/build/mathbox.css">
+  <style>
+    * { box-sizing: border-box; }
+    body { margin: 0; background: #1a1a2e; font-family: 'Segoe UI', sans-serif; color: #eee; }
+    .container { display: flex; width: 100%; height: 500px; }
+    .sidebar { width: 280px; min-width: 280px; background: #12121c; padding: 20px 15px; display: flex; flex-direction: column; gap: 12px; }
+    #mathbox { flex: 1; height: 100%; }
+    .section { background: rgba(255,255,255,0.05); border-radius: 8px; padding: 12px; }
+    .section h3 { margin: 0 0 10px 0; font-size: 14px; }
+    .badge { display: inline-block; padding: 3px 10px; border-radius: 4px; font-weight: bold; font-size: 12px; }
+    .e1-b { background: #e94560; }
+    .e2-b { background: #4d80e4; }
+    .slider-row { display: flex; align-items: center; margin: 6px 0; gap: 8px; }
+    .slider-row label { width: 20px; font-size: 13px; color: #aaa; }
+    .slider-row input[type="range"] { flex: 1; }
+    .slider-row .value { width: 40px; text-align: right; font-size: 13px; font-family: monospace; }
+    .e1-t { color: #e94560; }
+    .e2-t { color: #4d80e4; }
+    .matrix-result { text-align: center; padding: 15px; }
+    .matrix-display { font-size: 20px; font-family: monospace; }
+    .big-bracket { font-size: 50px; font-weight: 100; vertical-align: middle; }
+    .matrix-inner { display: inline-grid; grid-template-columns: 1fr 1fr; gap: 8px 15px; vertical-align: middle; }
+    .col1 { color: #e94560; }
+    .col2 { color: #4d80e4; }
+    .arrow { font-size: 24px; margin: 0 10px; }
+    .info { font-size: 12px; color: #888; text-align: center; margin-top: 10px; }
+  </style>
+</head>
+<body>
+<div class="container">
+  <div class="sidebar">
+    <div class="section">
+      <h3><span class="badge e1-b">e₁</span> goes to:</h3>
+      <div class="slider-row"><label>x:</label><input type="range" id="t1x" min="-3" max="3" step="0.1" value="1"><span class="value" id="t1x-val">1.0</span></div>
+      <div class="slider-row"><label>y:</label><input type="range" id="t1y" min="-3" max="3" step="0.1" value="0"><span class="value" id="t1y-val">0.0</span></div>
+      <div class="e1-t" style="text-align:center; margin-top:8px;">T(e₁) = (<span id="t1xd">1.0</span>, <span id="t1yd">0.0</span>)</div>
+    </div>
+    <div class="section">
+      <h3><span class="badge e2-b">e₂</span> goes to:</h3>
+      <div class="slider-row"><label>x:</label><input type="range" id="t2x" min="-3" max="3" step="0.1" value="0"><span class="value" id="t2x-val">0.0</span></div>
+      <div class="slider-row"><label>y:</label><input type="range" id="t2y" min="-3" max="3" step="0.1" value="1"><span class="value" id="t2y-val">1.0</span></div>
+      <div class="e2-t" style="text-align:center; margin-top:8px;">T(e₂) = (<span id="t2xd">0.0</span>, <span id="t2yd">1.0</span>)</div>
+    </div>
+    <div class="section matrix-result">
+      <div style="color:#aaa; margin-bottom:8px;">Matrix of T:</div>
+      <div class="matrix-display">
+        <span class="big-bracket">[</span>
+        <span class="matrix-inner">
+          <span class="col1" id="m11">1.0</span>
+          <span class="col2" id="m12">0.0</span>
+          <span class="col1" id="m21">0.0</span>
+          <span class="col2" id="m22">1.0</span>
+        </span>
+        <span class="big-bracket">]</span>
+      </div>
+      <div class="info">Columns are where basis vectors land!</div>
+    </div>
+  </div>
+  <div id="mathbox"></div>
+</div>
+<script src="https://cdn.jsdelivr.net/npm/three@0.137.0/build/three.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/three@0.137.0/examples/js/controls/OrbitControls.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/mathbox@2.3.1/build/bundle/mathbox.js"></script>
+<script>
+let t1 = [1, 0], t2 = [0, 1];
+function fmt(n) { return Number(n).toFixed(1); }
+
+const mathbox = MathBox.mathBox({
+  element: document.getElementById('mathbox'),
+  plugins: ['core', 'controls', 'cursor'],
+  controls: { klass: THREE.OrbitControls },
+  camera: { fov: 45 },
+});
+mathbox.three.renderer.setClearColor(new THREE.Color('#1a1a2e'), 1.0);
+mathbox.camera({ proxy: true, position: [0, 0, 6] });
+
+const view = mathbox.cartesian({ range: [[-4, 4], [-4, 4], [-1, 1]], scale: [2, 2, 1] });
+view.grid({ axes: [1, 2], width: 1, color: '#444', depth: 0.5 });
+view.axis({ axis: 1, width: 3, color: '#ffffff' });
+view.axis({ axis: 2, width: 3, color: '#ffffff' });
+
+view.array({ id: 'xlabels', width: 6, channels: 3, data: [[-3,-0.5,0],[-2,-0.5,0],[-1,-0.5,0],[1,-0.5,0],[2,-0.5,0],[3,-0.5,0]] });
+view.text({ data: ['-3','-2','-1','1','2','3'] });
+view.label({ points: '#xlabels', color: '#ffffff', background: '#1a1a2e', size: 16, depth: 0.5 });
+view.array({ id: 'ylabels', width: 6, channels: 3, data: [[-0.5,-3,0],[-0.5,-2,0],[-0.5,-1,0],[-0.5,1,0],[-0.5,2,0],[-0.5,3,0]] });
+view.text({ data: ['-3','-2','-1','1','2','3'] });
+view.label({ points: '#ylabels', color: '#ffffff', background: '#1a1a2e', size: 16, depth: 0.5 });
+
+// Original basis (faded)
+view.array({ id: 'e1orig', width: 2, channels: 3, data: [[0,0,0], [1,0,0]] });
+view.line({ points: '#e1orig', color: '#e94560', width: 4, opacity: 0.3 });
+view.array({ id: 'e2orig', width: 2, channels: 3, data: [[0,0,0], [0,1,0]] });
+view.line({ points: '#e2orig', color: '#4d80e4', width: 4, opacity: 0.3 });
+
+// Transformed basis
+view.array({ id: 't1pts', width: 2, channels: 3, data: [[0,0,0], [t1[0],t1[1],0]] });
+view.line({ points: '#t1pts', color: '#e94560', width: 8 });
+view.array({ id: 't1tip', width: 1, channels: 3, data: [[t1[0],t1[1],0]] });
+view.point({ points: '#t1tip', color: '#e94560', size: 20 });
+
+view.array({ id: 't2pts', width: 2, channels: 3, data: [[0,0,0], [t2[0],t2[1],0]] });
+view.line({ points: '#t2pts', color: '#4d80e4', width: 8 });
+view.array({ id: 't2tip', width: 1, channels: 3, data: [[t2[0],t2[1],0]] });
+view.point({ points: '#t2tip', color: '#4d80e4', size: 20 });
+
+function update() {
+  t1 = [parseFloat(document.getElementById('t1x').value), parseFloat(document.getElementById('t1y').value)];
+  t2 = [parseFloat(document.getElementById('t2x').value), parseFloat(document.getElementById('t2y').value)];
+  
+  mathbox.select('#t1pts').set('data', [[0,0,0], [t1[0],t1[1],0]]);
+  mathbox.select('#t1tip').set('data', [[t1[0],t1[1],0]]);
+  mathbox.select('#t2pts').set('data', [[0,0,0], [t2[0],t2[1],0]]);
+  mathbox.select('#t2tip').set('data', [[t2[0],t2[1],0]]);
+  
+  document.getElementById('t1x-val').textContent = fmt(t1[0]);
+  document.getElementById('t1y-val').textContent = fmt(t1[1]);
+  document.getElementById('t2x-val').textContent = fmt(t2[0]);
+  document.getElementById('t2y-val').textContent = fmt(t2[1]);
+  document.getElementById('t1xd').textContent = fmt(t1[0]);
+  document.getElementById('t1yd').textContent = fmt(t1[1]);
+  document.getElementById('t2xd').textContent = fmt(t2[0]);
+  document.getElementById('t2yd').textContent = fmt(t2[1]);
+  
+  // Matrix columns
+  document.getElementById('m11').textContent = fmt(t1[0]);
+  document.getElementById('m21').textContent = fmt(t1[1]);
+  document.getElementById('m12').textContent = fmt(t2[0]);
+  document.getElementById('m22').textContent = fmt(t2[1]);
+}
+
+document.querySelectorAll('input[type="range"]').forEach(input => input.addEventListener('input', update));
+</script>
+</body>
+</html>
