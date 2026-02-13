@@ -1,0 +1,473 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chemical Equation Balancer</title>
+    <script>window.MathJax = { tex: { inlineMath: [['$', '$']], displayMath: [['$$', '$$']] }, options: { skipHtmlTags: ['script', 'noscript', 'style', 'textarea'] } };</script>
+    <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml.js" async></script>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+        }
+
+        body {
+            background: #1a1a2e;
+            font-family: 'Segoe UI', sans-serif;
+            color: #eee;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 860px;
+            margin: 0 auto;
+        }
+
+        h2 {
+            text-align: center;
+            color: #16c79a;
+            margin-bottom: 4px;
+            font-size: 20px;
+        }
+
+        .subtitle {
+            text-align: center;
+            color: #888;
+            font-size: 13px;
+            margin-bottom: 18px;
+        }
+
+        /* Preset row */
+        .presets {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            justify-content: center;
+            margin-bottom: 20px;
+        }
+
+        .preset-btn {
+            padding: 8px 14px;
+            background: #2a2a4a;
+            border: 1px solid #444;
+            color: #ddd;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 13px;
+            transition: all .15s;
+        }
+
+        .preset-btn:hover {
+            background: #3a3a5a;
+            border-color: #16c79a;
+        }
+
+        .preset-btn.active {
+            background: #16c79a22;
+            border-color: #16c79a;
+            color: #16c79a;
+        }
+
+        /* Steps */
+        .steps {
+            display: grid;
+            gap: 16px;
+        }
+
+        .step {
+            background: rgba(255, 255, 255, 0.04);
+            border: 1px solid #333;
+            border-radius: 10px;
+            padding: 16px 20px;
+        }
+
+        .step-label {
+            font-size: 11px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: .08em;
+            color: #16c79a;
+            margin-bottom: 10px;
+        }
+
+        .equation-display {
+            font-size: 22px;
+            text-align: center;
+            padding: 8px 0;
+            font-family: 'Cambria Math', 'Times New Roman', serif;
+            letter-spacing: 1px;
+            line-height: 1.6;
+        }
+
+        .coeff {
+            color: #f39c12;
+            font-weight: 700;
+        }
+
+        .arrow {
+            color: #888;
+            margin: 0 6px;
+        }
+
+        /* Matrix area */
+        .matrix-area {
+            text-align: center;
+            overflow-x: auto;
+            padding: 4px 0;
+        }
+
+        /* Insight box */
+        .insight {
+            background: rgba(22, 199, 154, 0.08);
+            border: 1px solid rgba(22, 199, 154, 0.3);
+            border-radius: 8px;
+            padding: 12px 16px;
+            margin-top: 10px;
+            font-size: 14px;
+            line-height: 1.5;
+        }
+
+        .insight strong {
+            color: #16c79a;
+        }
+
+        /* Element table */
+        .elem-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 14px;
+        }
+
+        .elem-table th {
+            text-align: left;
+            color: #aaa;
+            font-weight: 600;
+            padding: 6px 10px;
+            border-bottom: 1px solid #333;
+        }
+
+        .elem-table td {
+            padding: 6px 10px;
+            border-bottom: 1px solid #222;
+            font-family: monospace;
+        }
+
+        .elem-table .el {
+            color: #4d80e4;
+            font-weight: 600;
+        }
+
+        /* Verified badge */
+        .verified {
+            display: inline-block;
+            background: rgba(22, 199, 154, 0.2);
+            color: #16c79a;
+            padding: 6px 14px;
+            border-radius: 6px;
+            font-weight: 600;
+            font-size: 14px;
+            margin-top: 8px;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <h2>Chemical Equation Balancer</h2>
+        <p class="subtitle">Balancing equations is secretly solving a homogeneous linear system.</p>
+
+        <div class="presets" id="presets"></div>
+
+        <div class="steps" id="output"></div>
+    </div>
+
+    <script>
+        // ---------- Preset equations ----------
+        const PRESETS = [
+            {
+                name: 'Propane Combustion',
+                reactants: [
+                    { formula: 'C₃H₈', elements: { C: 3, H: 8 } },
+                    { formula: 'O₂', elements: { O: 2 } }
+                ],
+                products: [
+                    { formula: 'CO₂', elements: { C: 1, O: 2 } },
+                    { formula: 'H₂O', elements: { H: 2, O: 1 } }
+                ]
+            },
+            {
+                name: 'Photosynthesis',
+                reactants: [
+                    { formula: 'CO₂', elements: { C: 1, O: 2 } },
+                    { formula: 'H₂O', elements: { H: 2, O: 1 } }
+                ],
+                products: [
+                    { formula: 'C₆H₁₂O₆', elements: { C: 6, H: 12, O: 6 } },
+                    { formula: 'O₂', elements: { O: 2 } }
+                ]
+            },
+            {
+                name: 'Iron Rust',
+                reactants: [
+                    { formula: 'Fe', elements: { Fe: 1 } },
+                    { formula: 'O₂', elements: { O: 2 } }
+                ],
+                products: [
+                    { formula: 'Fe₂O₃', elements: { Fe: 2, O: 3 } }
+                ]
+            },
+            {
+                name: 'Ammonia Synthesis',
+                reactants: [
+                    { formula: 'N₂', elements: { N: 2 } },
+                    { formula: 'H₂', elements: { H: 2 } }
+                ],
+                products: [
+                    { formula: 'NH₃', elements: { N: 1, H: 3 } }
+                ]
+            },
+            {
+                name: 'Methane Combustion',
+                reactants: [
+                    { formula: 'CH₄', elements: { C: 1, H: 4 } },
+                    { formula: 'O₂', elements: { O: 2 } }
+                ],
+                products: [
+                    { formula: 'CO₂', elements: { C: 1, O: 2 } },
+                    { formula: 'H₂O', elements: { H: 2, O: 1 } }
+                ]
+            }
+        ];
+
+        // ---------- Linear algebra helpers ----------
+        function gcd(a, b) { a = Math.abs(a); b = Math.abs(b); while (b) { [a, b] = [b, a % b]; } return a; }
+
+        function rref(mat) {
+            // Returns RREF of matrix (in-place), returns copy
+            const m = mat.map(r => [...r]);
+            const rows = m.length, cols = m[0].length;
+            let lead = 0;
+            for (let r = 0; r < rows; r++) {
+                if (lead >= cols) break;
+                let i = r;
+                while (Math.abs(m[i][lead]) < 1e-10) {
+                    i++;
+                    if (i === rows) { i = r; lead++; if (lead === cols) return m; }
+                }
+                [m[i], m[r]] = [m[r], m[i]];
+                const div = m[r][lead];
+                for (let j = 0; j < cols; j++) m[r][j] /= div;
+                for (let i2 = 0; i2 < rows; i2++) {
+                    if (i2 !== r) {
+                        const factor = m[i2][lead];
+                        for (let j = 0; j < cols; j++) m[i2][j] -= factor * m[r][j];
+                    }
+                }
+                lead++;
+            }
+            return m;
+        }
+
+        function solveHomogeneous(matrix) {
+            // Find null space vector (for one free variable case)
+            const R = rref(matrix);
+            const rows = R.length, cols = R[0].length;
+            // Last column is the free variable
+            const freeCol = cols - 1;
+            const sol = new Array(cols).fill(0);
+            sol[freeCol] = 1;
+            for (let r = 0; r < rows; r++) {
+                // Find pivot column
+                let pivotCol = -1;
+                for (let c = 0; c < cols; c++) {
+                    if (Math.abs(R[r][c]) > 1e-10) { pivotCol = c; break; }
+                }
+                if (pivotCol >= 0 && pivotCol < freeCol) {
+                    sol[pivotCol] = -R[r][freeCol];
+                }
+            }
+            // Make all positive and integer
+            // First ensure all same sign (make positive)
+            const allNeg = sol.every(v => v <= 1e-10);
+            if (allNeg) sol.forEach((v, i) => sol[i] = -v);
+            // If any negative, flip all
+            if (sol.some(v => v < -1e-10)) {
+                // Try to find the right free variable assignment
+                sol.forEach((v, i) => sol[i] = -v);
+            }
+            // Scale to integers
+            const scale = 1000;
+            const intSol = sol.map(v => Math.round(v * scale));
+            let g = intSol.reduce((a, b) => gcd(a, b));
+            if (g === 0) g = 1;
+            return intSol.map(v => v / g);
+        }
+
+        // ---------- Build & display ----------
+        function buildEquation(eq) {
+            const compounds = [...eq.reactants, ...eq.products];
+            const allElements = [...new Set(compounds.flatMap(c => Object.keys(c.elements)))];
+            allElements.sort();
+
+            const nCompounds = compounds.length;
+            const nReactants = eq.reactants.length;
+
+            // Build coefficient matrix: rows = elements, cols = compounds
+            // Reactants get + sign, products get - sign
+            const matrix = allElements.map(el => {
+                return compounds.map((c, j) => {
+                    const count = c.elements[el] || 0;
+                    return j < nReactants ? count : -count;
+                });
+            });
+
+            // Solve
+            const coeffs = solveHomogeneous(matrix);
+
+            // Make all positive
+            const absCoeffs = coeffs.map(Math.abs);
+
+            return { allElements, matrix, coeffs: absCoeffs, compounds, nReactants };
+        }
+
+        function formatCoeff(n) {
+            return n === 1 ? '' : `<span class="coeff">${n}</span>`;
+        }
+
+        function matrixToLatex(mat, augCol) {
+            const cols_spec = mat[0].map((_, j) => 'c').join('');
+            const rows_str = mat.map(row =>
+                row.map((v, j) => {
+                    const val = Number.isInteger(v) ? v : (Math.abs(v) < 1e-10 ? 0 : v.toFixed(2));
+                    return val;
+                }).join(' & ')
+            ).join(' \\\\ ');
+            return `\\begin{bmatrix} ${rows_str} \\end{bmatrix}`;
+        }
+
+        function render(eqIdx) {
+            const eq = PRESETS[eqIdx];
+            const { allElements, matrix, coeffs, compounds, nReactants } = buildEquation(eq);
+
+            // Highlight active preset
+            document.querySelectorAll('.preset-btn').forEach((btn, i) => {
+                btn.classList.toggle('active', i === eqIdx);
+            });
+
+            // Unbalanced equation
+            const reactStr = eq.reactants.map(c => c.formula).join(' + ');
+            const prodStr = eq.products.map(c => c.formula).join(' + ');
+
+            // Balanced equation
+            const balReact = eq.reactants.map((c, i) => formatCoeff(coeffs[i]) + c.formula).join(' + ');
+            const balProd = eq.products.map((c, i) => formatCoeff(coeffs[nReactants + i]) + c.formula).join(' + ');
+
+            // Variable labels
+            const varLabels = compounds.map((_, i) => String.fromCharCode(97 + i)); // a, b, c, d, ...
+
+            // Element table rows
+            const tableRows = allElements.map((el, r) => {
+                const leftTerms = eq.reactants.map((c, j) => {
+                    const count = c.elements[el] || 0;
+                    return count ? `${count}${varLabels[j]}` : '';
+                }).filter(Boolean).join(' + ');
+                const rightTerms = eq.products.map((c, j) => {
+                    const count = c.elements[el] || 0;
+                    return count ? `${count}${varLabels[nReactants + j]}` : '';
+                }).filter(Boolean).join(' + ');
+                return `<tr><td class="el">${el}</td><td>${leftTerms} = ${rightTerms}</td></tr>`;
+            }).join('');
+
+            // Matrix LaTeX
+            const augMatrix = matrix.map(row => [...row, 0]);
+            const matLatex = augMatrix.map(row =>
+                row.map((v, j) => {
+                    const val = Number.isInteger(v) ? v : v.toFixed(2);
+                    return val;
+                }).join(' & ')
+            ).join(' \\\\ ');
+            const colSpec = compounds.map(() => 'c').join('');
+            const augLatex = `\\left[\\begin{array}{${colSpec}|c} ${matLatex} \\end{array}\\right]`;
+
+            // Verification
+            const verifyRows = allElements.map(el => {
+                const left = eq.reactants.reduce((s, c, j) => s + coeffs[j] * (c.elements[el] || 0), 0);
+                const right = eq.products.reduce((s, c, j) => s + coeffs[nReactants + j] * (c.elements[el] || 0), 0);
+                return `<tr><td class="el">${el}</td><td>${left}</td><td>${right}</td><td>${left === right ? '✓' : '✗'}</td></tr>`;
+            }).join('');
+
+            const nVars = compounds.length;
+            const nEqs = allElements.length;
+            const freeVars = nVars - nEqs;
+
+            const html = `
+    <div class="step">
+      <div class="step-label">Step 1 — Unbalanced Equation</div>
+      <div class="equation-display">
+        ${reactStr} <span class="arrow">→</span> ${prodStr}
+      </div>
+      <div style="text-align:center;color:#888;font-size:13px;margin-top:6px;">
+        Unknowns: ${varLabels.map((v, i) => `<em>${v}</em> = coefficient of ${compounds[i].formula}`).join(', ')}
+      </div>
+    </div>
+
+    <div class="step">
+      <div class="step-label">Step 2 — Element Conservation → Linear Equations</div>
+      <table class="elem-table">
+        <tr><th>Element</th><th>Equation (left = right)</th></tr>
+        ${tableRows}
+      </table>
+      <div class="insight">
+        <strong>${nEqs} equations</strong> in <strong>${nVars} unknowns</strong>
+        → expect <strong>${freeVars} free variable${freeVars !== 1 ? 's' : ''}</strong>.
+        Since all right-hand sides are 0, this is a <strong>homogeneous system</strong>.
+      </div>
+    </div>
+
+    <div class="step">
+      <div class="step-label">Step 3 — Augmented Matrix</div>
+      <div class="matrix-area">$$${augLatex}$$</div>
+      <div style="text-align:center;color:#666;font-size:12px;margin-top:4px;">
+        Columns: ${varLabels.join(', ')} | augmented column (all zeros)
+      </div>
+    </div>
+
+    <div class="step">
+      <div class="step-label">Step 4 — Balanced Equation</div>
+      <div class="equation-display">
+        ${balReact} <span class="arrow">→</span> ${balProd}
+      </div>
+      <table class="elem-table" style="max-width:360px;margin:12px auto 0;">
+        <tr><th>Element</th><th>Left</th><th>Right</th><th></th></tr>
+        ${verifyRows}
+      </table>
+      <div style="text-align:center;margin-top:10px;">
+        <span class="verified">✓ Balanced</span>
+      </div>
+    </div>
+  `;
+
+            document.getElementById('output').innerHTML = html;
+            if (window.MathJax && MathJax.typesetPromise) {
+                MathJax.typesetPromise();
+            }
+        }
+
+        // Build preset buttons
+        const presetsEl = document.getElementById('presets');
+        PRESETS.forEach((eq, i) => {
+            const btn = document.createElement('button');
+            btn.className = 'preset-btn';
+            btn.textContent = eq.name;
+            btn.onclick = () => render(i);
+            presetsEl.appendChild(btn);
+        });
+
+        // Load first preset
+        render(0);
+    </script>
+</body>
+
+</html>

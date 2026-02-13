@@ -1,0 +1,395 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>3D Linear Transformations</title>
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            background: #1a1a2e;
+            font-family: 'Segoe UI', sans-serif;
+            color: #eee;
+            overflow: hidden;
+        }
+
+        .container {
+            display: flex;
+            width: 100vw;
+            height: 100vh;
+        }
+
+        .sidebar {
+            width: 300px;
+            min-width: 300px;
+            background: #12121c;
+            padding: 20px 15px;
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+            overflow-y: auto;
+            border-right: 1px solid #333;
+        }
+
+        #canvas-container {
+            flex: 1;
+            height: 100%;
+            position: relative;
+        }
+
+        .section {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 8px;
+            padding: 12px;
+        }
+
+        h3 {
+            margin: 0 0 10px 0;
+            font-size: 14px;
+            color: #aaa;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        .matrix-input {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            margin-bottom: 8px;
+        }
+
+        .matrix-bracket {
+            font-size: 60px;
+            font-weight: 300;
+            line-height: 0.8;
+            color: #666;
+        }
+
+        .matrix-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 6px;
+        }
+
+        .matrix-grid input {
+            width: 50px;
+            padding: 6px 4px;
+            text-align: center;
+            background: #2a2a4a;
+            border: 1px solid #444;
+            color: #fff;
+            border-radius: 4px;
+            font-size: 14px;
+        }
+
+        .matrix-grid input:focus {
+            border-color: #16c79a;
+            outline: none;
+        }
+
+        .btn-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 6px;
+        }
+
+        .preset-btn {
+            padding: 8px;
+            background: #2a2a4a;
+            border: 1px solid #444;
+            color: #ddd;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 12px;
+            transition: all 0.15s;
+        }
+
+        .preset-btn:hover {
+            background: #3a3a5a;
+            border-color: #777;
+        }
+
+        .preset-btn.active {
+            background: #16c79a22;
+            border-color: #16c79a;
+            color: #16c79a;
+        }
+
+        .legend {
+            font-size: 12px;
+            margin-top: 4px;
+            display: grid;
+            gap: 4px;
+        }
+
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+        }
+
+        .controls-info {
+            position: absolute;
+            bottom: 15px;
+            left: 15px;
+            color: #666;
+            font-size: 12px;
+            pointer-events: none;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <div class="sidebar">
+            <div class="section">
+                <h3>Transformation Matrix A</h3>
+                <div class="matrix-input">
+                    <div class="matrix-bracket">[</div>
+                    <div class="matrix-grid">
+                        <input type="number" id="m00" value="1" step="0.1"><input type="number" id="m01" value="0"
+                            step="0.1"><input type="number" id="m02" value="0" step="0.1">
+                        <input type="number" id="m10" value="0" step="0.1"><input type="number" id="m11" value="1"
+                            step="0.1"><input type="number" id="m12" value="0" step="0.1">
+                        <input type="number" id="m20" value="0" step="0.1"><input type="number" id="m21" value="0"
+                            step="0.1"><input type="number" id="m22" value="1" step="0.1">
+                    </div>
+                    <div class="matrix-bracket">]</div>
+                </div>
+                <div class="legend">
+                    <div class="legend-item">
+                        <div class="dot" style="background:#e94560"></div> e₁ (x-axis) → Column 1
+                    </div>
+                    <div class="legend-item">
+                        <div class="dot" style="background:#4d80e4"></div> e₂ (y-axis) → Column 2
+                    </div>
+                    <div class="legend-item">
+                        <div class="dot" style="background:#16c79a"></div> e₃ (z-axis) → Column 3
+                    </div>
+                </div>
+            </div>
+
+            <div class="section">
+                <h3>Presets</h3>
+                <div class="btn-grid">
+                    <button class="preset-btn" onclick="setMatrix(1,0,0, 0,1,0, 0,0,1)">Identity</button>
+                    <button class="preset-btn" onclick="setMatrix(2,0,0, 0,2,0, 0,0,2)">Scale All (2×)</button>
+                    <button class="preset-btn" onclick="setMatrix(1,0,0, 0,1,0, 0,0,0)">Project to XY</button>
+                    <button class="preset-btn" onclick="setMatrix(0,0,0, 0,1,0, 0,0,1)">Project to YZ</button>
+                    <button class="preset-btn" onclick="setMatrix(1,0,0, 0,0,-1, 0,1,0)">Rotate X (90°)</button>
+                    <button class="preset-btn" onclick="setMatrix(0,-1,0, 1,0,0, 0,0,1)">Rotate Z (90°)</button>
+                    <button class="preset-btn" onclick="setMatrix(1,0,1, 0,1,0, 0,0,1)">Shear X (by Z)</button>
+                    <button class="preset-btn" onclick="setMatrix(1,0,0, 0,1,1, 0,0,1)">Shear Y (by Z)</button>
+                </div>
+            </div>
+
+            <div class="section">
+                <h3>Determinant</h3>
+                <div id="det-value" style="font-size: 20px; font-family: monospace; text-align: center;">1.00</div>
+                <div style="font-size: 12px; color: #888; text-align: center; margin-top: 4px;">Volume scaling factor
+                </div>
+            </div>
+        </div>
+        <div id="canvas-container">
+            <div class="controls-info">Left Click: Rotate • Right Click: Pan • Scroll: Zoom</div>
+        </div>
+    </div>
+
+    <!-- Three.js CDN -->
+    <script async src="https://unpkg.com/es-module-shims@1.6.3/dist/es-module-shims.js"></script>
+    <script type="importmap">
+  {
+    "imports": {
+      "three": "https://unpkg.com/three@0.150.1/build/three.module.js",
+      "three/addons/": "https://unpkg.com/three@0.150.1/examples/jsm/"
+    }
+  }
+</script>
+
+    <script type="module">
+        import * as THREE from 'three';
+        import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+
+        // Scene setup
+        const container = document.getElementById('canvas-container');
+        const scene = new THREE.Scene();
+        scene.background = new THREE.Color('#1a1a2e');
+
+        const camera = new THREE.PerspectiveCamera(45, container.clientWidth / container.clientHeight, 0.1, 100);
+        camera.position.set(4, 3, 5);
+        camera.up.set(0, 0, 1); // Z is up
+
+        const renderer = new THREE.WebGLRenderer({ antialias: true });
+        renderer.setSize(container.clientWidth, container.clientHeight);
+        container.appendChild(renderer.domElement);
+
+        const controls = new OrbitControls(camera, renderer.domElement);
+        controls.enableDamping = true;
+
+        // Lights
+        const ambientLight = new THREE.AmbientLight(0xffffff, 0.6);
+        scene.add(ambientLight);
+        const dirLight = new THREE.DirectionalLight(0xffffff, 0.8);
+        dirLight.position.set(5, 5, 10);
+        scene.add(dirLight);
+
+        // Group to hold everything that gets transformed
+        const transformedGroup = new THREE.Group();
+        scene.add(transformedGroup);
+
+        // Helper geometry
+        // 1. Static Grid (faded)
+        const gridHelper = new THREE.GridHelper(10, 10, 0x444444, 0x222222);
+        gridHelper.rotation.x = Math.PI / 2; // Lie flat on XY plane
+        scene.add(gridHelper);
+
+        // 2. Axes Helper (static)
+        const axesHelper = new THREE.AxesHelper(1.5);
+        scene.add(axesHelper);
+
+        // 3. The Object: A Unit Cube with edges and faces
+        // We'll create a custom object so we can transform vertices manually
+
+        // Cube geometry
+        const boxGeo = new THREE.BoxGeometry(1, 1, 1);
+        // Shift so corner is at origin (0,0,0) to start, typically easier to see linear transforms
+        // Actually, standard unit cube usually centered at 0 or corner at 0. Let's center at 0.5,0.5,0.5 so it sits in the first octant
+        boxGeo.translate(0.5, 0.5, 0.5);
+
+        const boxMat = new THREE.MeshLambertMaterial({
+            color: 0xffffff,
+            transparent: true,
+            opacity: 0.15,
+            side: THREE.DoubleSide
+        });
+        const cubeMesh = new THREE.Mesh(boxGeo, boxMat);
+
+        // Edges
+        const edgeGeo = new THREE.EdgesGeometry(boxGeo);
+        const edgeMat = new THREE.LineBasicMaterial({ color: 0xffffff, opacity: 0.4, transparent: true });
+        const cubeEdges = new THREE.LineSegments(edgeGeo, edgeMat);
+
+        // New Group for the object that will be transformed via matrix
+        // Actually, Three.js matrix auto-updates. We can just set the matrix of a group.
+        // But wait, user input is a linear transform (3x3). Three.js uses 4x4.
+        // We can construct a Matrix4 from the user's 3x3 input.
+
+        const objectGroup = new THREE.Group();
+        objectGroup.add(cubeMesh);
+        objectGroup.add(cubeEdges);
+
+        // Basis vectors (inside the transform group so they move)
+        // e1 arrow
+        const dir1 = new THREE.Vector3(1, 0, 0);
+        const origin = new THREE.Vector3(0, 0, 0);
+        const arrow1 = new THREE.ArrowHelper(dir1, origin, 1, 0xe94560);
+
+        // e2 arrow
+        const dir2 = new THREE.Vector3(0, 1, 0);
+        const arrow2 = new THREE.ArrowHelper(dir2, origin, 1, 0x4d80e4);
+
+        // e3 arrow
+        const dir3 = new THREE.Vector3(0, 0, 1);
+        const arrow3 = new THREE.ArrowHelper(dir3, origin, 1, 0x16c79a);
+
+        // Make arrows thicker/visible
+        arrow1.line.material.linewidth = 3;
+        arrow2.line.material.linewidth = 3;
+        arrow3.line.material.linewidth = 3;
+
+        objectGroup.add(arrow1);
+        objectGroup.add(arrow2);
+        objectGroup.add(arrow3);
+
+        scene.add(objectGroup);
+
+        // Matrix logic
+        function getInputValue(id) {
+            return parseFloat(document.getElementById(id).value) || 0;
+        }
+
+        function updateTransform() {
+            // Read 3x3 matrix values
+            // Input layout:
+            // m00 m01 m02
+            // m10 m11 m12
+            // m20 m21 m22
+            // Rows in math usually represented. Three.js Matrix4 is column-major internal, set() takes row-major.
+
+            const m00 = getInputValue('m00'); const m01 = getInputValue('m01'); const m02 = getInputValue('m02');
+            const m10 = getInputValue('m10'); const m11 = getInputValue('m11'); const m12 = getInputValue('m12');
+            const m20 = getInputValue('m20'); const m21 = getInputValue('m21'); const m22 = getInputValue('m22');
+
+            // Create 4x4 matrix (Linear transform only, translation = 0)
+            const mat = new THREE.Matrix4();
+            mat.set(
+                m00, m01, m02, 0,
+                m10, m11, m12, 0,
+                m20, m21, m22, 0,
+                0, 0, 0, 1
+            );
+
+            // Apply to object group
+            objectGroup.matrix.copy(mat);
+            objectGroup.matrixAutoUpdate = false; // Important: we control the matrix manually
+
+            // Calculate determinant
+            const det = m00 * (m11 * m22 - m12 * m21) -
+                m01 * (m10 * m22 - m12 * m20) +
+                m02 * (m10 * m21 - m11 * m20);
+
+            document.getElementById('det-value').textContent = det.toFixed(2);
+            document.getElementById('det-value').style.color = Math.abs(det) < 1e-6 ? '#e74c3c' : '#eee';
+        }
+
+        // Animation Loop
+        function animate() {
+            requestAnimationFrame(animate);
+            controls.update();
+            renderer.render(scene, camera);
+        }
+
+        // Initialize
+        updateTransform();
+        animate();
+
+        // Expose update function properly
+        window.updateMatrix = updateTransform;
+
+        // Window resize handle
+        window.addEventListener('resize', () => {
+            camera.aspect = container.clientWidth / container.clientHeight;
+            camera.updateProjectionMatrix();
+            renderer.setSize(container.clientWidth, container.clientHeight);
+        });
+
+        // Inputs listener
+        document.querySelectorAll('input').forEach(inp => {
+            inp.addEventListener('input', updateTransform);
+        });
+    </script>
+
+    <script>
+        function setMatrix(m00, m01, m02, m10, m11, m12, m20, m21, m22) {
+            document.getElementById('m00').value = m00; document.getElementById('m01').value = m01; document.getElementById('m02').value = m02;
+            document.getElementById('m10').value = m10; document.getElementById('m11').value = m11; document.getElementById('m12').value = m12;
+            document.getElementById('m20').value = m20; document.getElementById('m21').value = m21; document.getElementById('m22').value = m22;
+            // Trigger update
+            if (window.updateMatrix) window.updateMatrix();
+        }
+    </script>
+</body>
+
+</html>
