@@ -20,6 +20,8 @@ Navigate to any section of the course.
 | [1.3](../articles/unit1/1.3-interpreting-solutions.html) | Interpreting Solutions |
 | [1.4](../articles/unit1/1.4-applications.html) | Applications |
 
+📝 **[Practice: Unit 1 Skills & Quizzes](../exercises/unit1/index.html)** — 8 skills, 48 questions, section quizzes & unit test
+
 ---
 
 ## Unit 2: Vectors and Linear Combinations
@@ -32,6 +34,8 @@ Navigate to any section of the course.
 | [2.2](../articles/unit2/2.2-linear-combinations-and-span.html) | Linear Combinations and Span |
 | [2.3](../articles/unit2/2.3-linear-independence.html) | Linear Independence |
 
+📝 **[Practice: Unit 2 Skills & Quizzes](../exercises/unit2/index.html)** — 6 skills, 36 questions, section quizzes & unit test
+
 ---
 
 ## Unit 3: Matrix-Vector Multiplication & Transformations
@@ -43,6 +47,8 @@ Navigate to any section of the course.
 | [3.1](../articles/unit3/3.1-matrix-vector-multiplication.html) | Matrix-Vector Multiplication |
 | [3.2](../articles/unit3/3.2-linear-transformations.html) | Linear Transformations |
 | [3.3](../articles/unit3/3.3-matrix-of-transformation.html) | The Matrix of a Transformation |
+
+📝 **[Practice: Unit 3 Skills & Quizzes](../exercises/unit3/index.html)** — 6 skills, 36 questions, section quizzes & unit test
 
 ---
 

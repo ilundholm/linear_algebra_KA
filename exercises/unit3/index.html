@@ -1,0 +1,337 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Unit 3: Matrix-Vector & Transformations — Practice</title>
+    <link rel="stylesheet" href="../exercise-style.css">
+    <style>
+        .unit-landing {
+            max-width: 960px;
+            margin: 0 auto;
+            padding: 32px 24px;
+            font-family: 'Inter', system-ui, sans-serif;
+        }
+
+        .unit-landing h1 {
+            font-size: 28px;
+            font-weight: 700;
+            margin-bottom: 6px;
+        }
+
+        .unit-landing .unit-subtitle {
+            color: var(--text-secondary);
+            font-size: 16px;
+            margin-bottom: 32px;
+        }
+
+        .section-block {
+            background: var(--bg-primary);
+            border: 1px solid var(--border-color);
+            border-radius: var(--border-radius-lg);
+            margin-bottom: 20px;
+            overflow: hidden;
+        }
+
+        .section-header {
+            padding: 18px 24px;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .section-header h2 {
+            font-size: 20px;
+            font-weight: 600;
+            margin: 0;
+        }
+
+        .section-body {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 0;
+        }
+
+        .learn-col,
+        .practice-col {
+            padding: 20px 24px;
+        }
+
+        .learn-col {
+            border-right: 1px solid var(--border-color);
+        }
+
+        .col-label {
+            font-size: 12px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            color: var(--text-muted);
+            margin-bottom: 12px;
+        }
+
+        .article-link {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 8px 12px;
+            border-radius: 6px;
+            text-decoration: none;
+            color: var(--text-primary);
+            font-size: 15px;
+            transition: background 0.15s;
+        }
+
+        .article-link:hover {
+            background: var(--bg-secondary);
+        }
+
+        .article-link .icon {
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            background: var(--bg-secondary);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 13px;
+            color: var(--text-muted);
+            flex-shrink: 0;
+        }
+
+        .skill-link {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 10px 14px;
+            border-radius: 8px;
+            text-decoration: none;
+            color: var(--text-primary);
+            border: 1px solid var(--border-color);
+            margin-bottom: 8px;
+            transition: all 0.15s;
+        }
+
+        .skill-link:hover {
+            border-color: var(--border-selected);
+            background: var(--color-brand-light);
+        }
+
+        .skill-link .skill-icon {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            background: var(--bg-secondary);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 15px;
+            flex-shrink: 0;
+        }
+
+        .skill-link .skill-info {
+            flex: 1;
+        }
+
+        .skill-link .skill-name {
+            font-size: 14px;
+            font-weight: 600;
+        }
+
+        .skill-link .skill-meta {
+            font-size: 12px;
+            color: var(--text-muted);
+        }
+
+        .skill-link .practice-badge {
+            font-size: 13px;
+            font-weight: 600;
+            color: var(--color-brand);
+        }
+
+        .assessments {
+            max-width: 960px;
+            margin: 0 auto 32px;
+            padding: 0 24px;
+            display: flex;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+
+        .assess-link {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 12px 20px;
+            border-radius: 8px;
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 14px;
+            border: 2px solid var(--border-color);
+            color: var(--text-primary);
+            transition: all 0.15s;
+            background: var(--bg-primary);
+        }
+
+        .assess-link:hover {
+            border-color: var(--color-brand);
+            background: var(--color-brand-light);
+            color: var(--color-brand);
+        }
+
+        .assess-link.unit-test {
+            border-color: var(--color-brand);
+            background: var(--color-brand);
+            color: white;
+        }
+
+        .assess-link.unit-test:hover {
+            background: var(--color-brand-hover);
+        }
+
+        .back-link {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            color: var(--color-brand);
+            text-decoration: none;
+            font-size: 14px;
+            font-weight: 500;
+            margin-bottom: 16px;
+        }
+
+        .back-link:hover {
+            text-decoration: underline;
+        }
+
+        @media (max-width: 640px) {
+            .section-body {
+                grid-template-columns: 1fr;
+            }
+
+            .learn-col {
+                border-right: none;
+                border-bottom: 1px solid var(--border-color);
+            }
+
+            .assessments {
+                flex-direction: column;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="unit-landing">
+        <a href="../../units/index.md" class="back-link">← All units</a>
+        <h1>Unit 3: Matrix-Vector & Transformations</h1>
+        <p class="unit-subtitle">Matrices as functions: geometry meets algebra.</p>
+
+        <div class="section-block">
+            <div class="section-header">
+                <h2>3.1 Matrix-Vector Products</h2>
+            </div>
+            <div class="section-body">
+                <div class="learn-col">
+                    <div class="col-label">Learn</div>
+                    <a class="article-link" href="../../articles/unit3/3.1-matrix-vector-products.html">
+                        <div class="icon">📖</div> Matrix-Vector Products
+                    </a>
+                </div>
+                <div class="practice-col">
+                    <div class="col-label">Practice</div>
+                    <a class="skill-link" href="skill-matrix-vector-products.html">
+                        <div class="skill-icon">✏️</div>
+                        <div class="skill-info">
+                            <div class="skill-name">Matrix-Vector Products</div>
+                            <div class="skill-meta">4 questions</div>
+                        </div>
+                        <span class="practice-badge">Practice</span>
+                    </a>
+                    <a class="skill-link" href="skill-dimensions-compatibility.html">
+                        <div class="skill-icon">✏️</div>
+                        <div class="skill-info">
+                            <div class="skill-name">Dimensions & Compatibility</div>
+                            <div class="skill-meta">4 questions</div>
+                        </div>
+                        <span class="practice-badge">Practice</span>
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <div class="section-block">
+            <div class="section-header">
+                <h2>3.2 Linear Transformations</h2>
+            </div>
+            <div class="section-body">
+                <div class="learn-col">
+                    <div class="col-label">Learn</div>
+                    <a class="article-link" href="../../articles/unit3/3.2-linear-transformations.html">
+                        <div class="icon">📖</div> Linear Transformations
+                    </a>
+                </div>
+                <div class="practice-col">
+                    <div class="col-label">Practice</div>
+                    <a class="skill-link" href="skill-transformation-identification.html">
+                        <div class="skill-icon">✏️</div>
+                        <div class="skill-info">
+                            <div class="skill-name">Transformation Identification</div>
+                            <div class="skill-meta">4 questions</div>
+                        </div>
+                        <span class="practice-badge">Practice</span>
+                    </a>
+                    <a class="skill-link" href="skill-properties-transformations.html">
+                        <div class="skill-icon">✏️</div>
+                        <div class="skill-info">
+                            <div class="skill-name">Properties of Linear Transformations</div>
+                            <div class="skill-meta">4 questions</div>
+                        </div>
+                        <span class="practice-badge">Practice</span>
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <div class="section-block">
+            <div class="section-header">
+                <h2>3.3 Standard Matrices</h2>
+            </div>
+            <div class="section-body">
+                <div class="learn-col">
+                    <div class="col-label">Learn</div>
+                    <a class="article-link" href="../../articles/unit3/3.3-standard-matrices.html">
+                        <div class="icon">📖</div> Standard Matrices
+                    </a>
+                </div>
+                <div class="practice-col">
+                    <div class="col-label">Practice</div>
+                    <a class="skill-link" href="skill-build-transformation-matrices.html">
+                        <div class="skill-icon">✏️</div>
+                        <div class="skill-info">
+                            <div class="skill-name">Build Transformation Matrices</div>
+                            <div class="skill-meta">4 questions</div>
+                        </div>
+                        <span class="practice-badge">Practice</span>
+                    </a>
+                    <a class="skill-link" href="skill-standard-matrices.html">
+                        <div class="skill-icon">✏️</div>
+                        <div class="skill-info">
+                            <div class="skill-name">Standard Matrices</div>
+                            <div class="skill-meta">4 questions</div>
+                        </div>
+                        <span class="practice-badge">Practice</span>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="assessments">
+        <a class="assess-link" href="quiz-3-1.html">📝 Quiz: Section 3.1</a>
+        <a class="assess-link" href="quiz-3-2.html">📝 Quiz: Section 3.2</a>
+        <a class="assess-link" href="quiz-3-3.html">📝 Quiz: Section 3.3</a>
+        <a class="assess-link unit-test" href="unit-test.html">🎯 Unit 3 Test (12 questions)</a>
+    </div>
+</body>
+
+</html>

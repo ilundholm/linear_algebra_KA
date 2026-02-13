@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Skill: Transformation Identification — Unit 3</title>
+    <link rel="stylesheet" href="../exercise-style.css">
+    <script>window.MathJax = { tex: { inlineMath: [['$', '$']], displayMath: [['$$', '$$']] } };</script>
+    <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml.js" async></script>
+</head>
+
+<body>
+    <div id="exercise-app"></div>
+    <script src="question-bank.js"></script>
+    <script src="../exercise-engine.js"></script>
+    <script>
+        const engine = new ExerciseEngine({
+            unitTitle: 'Matrix-Vector & Transformations',
+            unitNumber: '3',
+            modeLabel: 'Transformation Identification',
+            backUrl: '../../index.html',
+            landingUrl: 'index.html',
+            sampleSize: 4,
+            questions: UNIT3_BANK['3.2a'].questions
+        });
+    </script>
+</body>
+
+</html>

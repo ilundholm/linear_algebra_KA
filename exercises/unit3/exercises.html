@@ -1,0 +1,275 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Unit 3 Practice — Matrix-Vector Multiplication &amp; Transformations</title>
+    <link rel="stylesheet" href="../exercise-style.css">
+    <script>
+        window.MathJax = {
+            tex: { inlineMath: [['$', '$'], ['\\(', '\\)']], displayMath: [['$$', '$$'], ['\\[', '\\]']] },
+            options: { skipHtmlTags: ['script', 'noscript', 'style', 'textarea'] }
+        };
+    </script>
+    <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml.js" async></script>
+</head>
+
+<body>
+    <div id="exercise-app"></div>
+    <script src="../exercise-engine.js"></script>
+    <script>
+        const engine = new ExerciseEngine({
+            unitTitle: 'Matrix-Vector Multiplication & Transformations',
+            unitNumber: '3',
+            backUrl: '../../index.html',
+            questions: [
+                // ───── 3.1 Matrix-Vector Multiplication ─────
+                {
+                    skill: '3.1 — Compute Ax (2×2)',
+                    question: 'Compute the matrix-vector product:<div class="math-block">$$\\begin{bmatrix} 1 & 2 \\\\ 3 & 4 \\end{bmatrix} \\begin{bmatrix} 5 \\\\ 6 \\end{bmatrix}$$</div>',
+                    answers: [
+                        '$\\begin{bmatrix} 17 \\\\ 39 \\end{bmatrix}$',
+                        '$\\begin{bmatrix} 11 \\\\ 27 \\end{bmatrix}$',
+                        '$\\begin{bmatrix} 17 \\\\ 27 \\end{bmatrix}$',
+                        '$\\begin{bmatrix} 5 \\\\ 18 \\end{bmatrix}$'
+                    ],
+                    correct: 0,
+                    hints: [
+                        'Each entry of the result is a dot product of a <em>row</em> of the matrix with the vector.',
+                        'Row 1: $1(5) + 2(6) = 5 + 12 = 17$.',
+                        'Row 2: $3(5) + 4(6) = 15 + 24 = 39$.'
+                    ],
+                    solution: '<p>Compute each row\'s dot product with the vector:</p><div class="step"><strong>Row 1:</strong> $1(5) + 2(6) = 5 + 12 = 17$</div><div class="step"><strong>Row 2:</strong> $3(5) + 4(6) = 15 + 24 = 39$</div><p>Answer: $\\begin{bmatrix} 17 \\\\ 39 \\end{bmatrix}$</p>'
+                },
+                {
+                    skill: '3.1 — Compute Ax (3×3)',
+                    question: 'Compute:<div class="math-block">$$\\begin{bmatrix} 1 & 0 & 2 \\\\ 0 & 1 & 3 \\\\ 0 & 0 & 1 \\end{bmatrix} \\begin{bmatrix} 1 \\\\ 2 \\\\ 3 \\end{bmatrix}$$</div>',
+                    answers: [
+                        '$\\begin{bmatrix} 7 \\\\ 11 \\\\ 3 \\end{bmatrix}$',
+                        '$\\begin{bmatrix} 1 \\\\ 2 \\\\ 3 \\end{bmatrix}$',
+                        '$\\begin{bmatrix} 7 \\\\ 2 \\\\ 3 \\end{bmatrix}$',
+                        '$\\begin{bmatrix} 1 \\\\ 11 \\\\ 3 \\end{bmatrix}$'
+                    ],
+                    correct: 0,
+                    hints: [
+                        'Row 1: $1(1) + 0(2) + 2(3) = ?$',
+                        'Row 1: $1 + 0 + 6 = 7$. Row 2: $0(1) + 1(2) + 3(3) = 0 + 2 + 9 = 11$.',
+                        'Row 3: $0(1) + 0(2) + 1(3) = 3$.'
+                    ],
+                    solution: '<p>Dot product of each row with $[1, 2, 3]^T$:</p><div class="step"><strong>Row 1:</strong> $1(1) + 0(2) + 2(3) = 1 + 0 + 6 = 7$</div><div class="step"><strong>Row 2:</strong> $0(1) + 1(2) + 3(3) = 0 + 2 + 9 = 11$</div><div class="step"><strong>Row 3:</strong> $0(1) + 0(2) + 1(3) = 3$</div><p>Answer: $\\begin{bmatrix} 7 \\\\ 11 \\\\ 3 \\end{bmatrix}$</p>'
+                },
+                {
+                    skill: '3.1 — Dimension Compatibility',
+                    question: '$A$ is a $3 \\times 4$ matrix. Which vector can you multiply $A$ by?',
+                    answers: [
+                        'A vector in $\\mathbb{R}^3$',
+                        'A vector in $\\mathbb{R}^4$',
+                        'A vector in $\\mathbb{R}^7$',
+                        'Any vector'
+                    ],
+                    correct: 1,
+                    hints: [
+                        'For the product $A\\mathbf{x}$ to be defined, the number of columns of $A$ must equal the number of entries in $\\mathbf{x}$.',
+                        '$A$ has 4 columns, so $\\mathbf{x}$ must have 4 entries.',
+                        'That means $\\mathbf{x}$ must be in $\\mathbb{R}^4$.'
+                    ],
+                    solution: '<p>The product $A\\mathbf{x}$ is defined when the number of <strong>columns</strong> of $A$ matches the number of <strong>entries</strong> in $\\mathbf{x}$.</p><div class="step">$A$ is $3 \\times \\mathbf{4}$ → needs a vector in $\\mathbb{R}^{\\mathbf{4}}$</div><p>The result will be in $\\mathbb{R}^3$ (number of rows of $A$).</p>'
+                },
+                {
+                    skill: '3.1 — Column Method',
+                    question: 'Write $\\begin{bmatrix} 1 & 3 \\\\ 2 & 4 \\end{bmatrix} \\begin{bmatrix} 2 \\\\ -1 \\end{bmatrix}$ as a linear combination of the columns of the matrix.',
+                    answers: [
+                        '$2\\begin{bmatrix}1\\\\2\\end{bmatrix} + (-1)\\begin{bmatrix}3\\\\4\\end{bmatrix}$',
+                        '$\\begin{bmatrix}1\\\\2\\end{bmatrix} + 3\\begin{bmatrix}2\\\\-1\\end{bmatrix}$',
+                        '$2\\begin{bmatrix}1\\\\3\\end{bmatrix} + (-1)\\begin{bmatrix}2\\\\4\\end{bmatrix}$',
+                        '$2\\begin{bmatrix}3\\\\4\\end{bmatrix} + (-1)\\begin{bmatrix}1\\\\2\\end{bmatrix}$'
+                    ],
+                    correct: 0,
+                    hints: [
+                        'The column method says: $A\\mathbf{x} = x_1 \\cdot (\\text{column 1}) + x_2 \\cdot (\\text{column 2})$.',
+                        'Column 1 of $A$ is $[1, 2]^T$. Column 2 is $[3, 4]^T$.',
+                        'The vector $\\mathbf{x} = [2, -1]^T$, so: $2[1,2]^T + (-1)[3,4]^T$.'
+                    ],
+                    solution: '<p>The column interpretation of $A\\mathbf{x}$:</p><div class="step">$A\\mathbf{x} = x_1 \\cdot \\text{col}_1 + x_2 \\cdot \\text{col}_2$</div><div class="step">$= 2\\begin{bmatrix}1\\\\2\\end{bmatrix} + (-1)\\begin{bmatrix}3\\\\4\\end{bmatrix}$</div><div class="step">$= \\begin{bmatrix}2\\\\4\\end{bmatrix} + \\begin{bmatrix}-3\\\\-4\\end{bmatrix} = \\begin{bmatrix}-1\\\\0\\end{bmatrix}$</div>'
+                },
+                {
+                    skill: '3.1 — Identity Matrix',
+                    question: 'Let $I$ be the $3 \\times 3$ identity matrix. What is $I \\cdot \\begin{bmatrix} 7 \\\\ -2 \\\\ 5 \\end{bmatrix}$?',
+                    answers: [
+                        '$\\begin{bmatrix} 0 \\\\ 0 \\\\ 0 \\end{bmatrix}$',
+                        '$\\begin{bmatrix} 7 \\\\ -2 \\\\ 5 \\end{bmatrix}$',
+                        '$\\begin{bmatrix} 1 \\\\ 1 \\\\ 1 \\end{bmatrix}$',
+                        '$\\begin{bmatrix} 7 \\\\ 7 \\\\ 7 \\end{bmatrix}$'
+                    ],
+                    correct: 1,
+                    hints: [
+                        'The identity matrix $I$ has $1$s on the diagonal and $0$s everywhere else.',
+                        'Multiplying any vector by $I$ gives you the same vector back: $I\\mathbf{x} = \\mathbf{x}$.',
+                        'This is why it\'s called the "identity" — it\'s the do-nothing transformation.'
+                    ],
+                    solution: '<p>The identity matrix is the <strong>do-nothing transformation</strong>:</p><div class="step">$I = \\begin{bmatrix}1&0&0\\\\0&1&0\\\\0&0&1\\end{bmatrix}$</div><div class="step">$I\\mathbf{x} = 1 \\cdot x_1 \\mathbf{e}_1 + 1 \\cdot x_2 \\mathbf{e}_2 + 1 \\cdot x_3 \\mathbf{e}_3 = \\mathbf{x}$</div><p>Every vector is unchanged: $I \\begin{bmatrix}7\\\\-2\\\\5\\end{bmatrix} = \\begin{bmatrix}7\\\\-2\\\\5\\end{bmatrix}$.</p>'
+                },
+
+                // ───── 3.2 Linear Transformations ─────
+                {
+                    skill: '3.2 — Standard Transformation',
+                    question: 'What transformation does this matrix represent?<div class="math-block">$$\\begin{bmatrix} 0 & -1 \\\\ 1 & 0 \\end{bmatrix}$$</div>',
+                    answers: [
+                        'Rotation by $90°$ counterclockwise',
+                        'Rotation by $90°$ clockwise',
+                        'Reflection across the $x$-axis',
+                        'Horizontal shear'
+                    ],
+                    correct: 0,
+                    hints: [
+                        'Check where the basis vectors land. $\\mathbf{e}_1 = [1,0]^T$ goes to column 1: $[0,1]^T$.',
+                        '$\\mathbf{e}_2 = [0,1]^T$ goes to column 2: $[-1,0]^T$.',
+                        'The point $(1,0)$ moved to $(0,1)$ and $(0,1)$ moved to $(-1,0)$. That\'s a $90°$ counterclockwise rotation!'
+                    ],
+                    solution: '<p>Track where the standard basis vectors land:</p><div class="step">$\\mathbf{e}_1 = \\begin{bmatrix}1\\\\0\\end{bmatrix} \\rightarrow \\begin{bmatrix}0\\\\1\\end{bmatrix}$ (column 1)</div><div class="step">$\\mathbf{e}_2 = \\begin{bmatrix}0\\\\1\\end{bmatrix} \\rightarrow \\begin{bmatrix}-1\\\\0\\end{bmatrix}$ (column 2)</div><p>The point on the positive $x$-axis moved to the positive $y$-axis, and the positive $y$-axis went to the negative $x$-axis. This is a <strong>90° counterclockwise rotation</strong>.</p><p>It matches the rotation formula: $R(\\theta) = \\begin{bmatrix}\\cos\\theta & -\\sin\\theta \\\\ \\sin\\theta & \\cos\\theta\\end{bmatrix}$ with $\\theta = 90°$.</p>'
+                },
+                {
+                    skill: '3.2 — Basis Vector Image',
+                    question: 'Under the transformation with matrix $\\begin{bmatrix} 3 & 1 \\\\ -2 & 4 \\end{bmatrix}$, where does $\\begin{bmatrix}1\\\\0\\end{bmatrix}$ land?',
+                    answers: [
+                        '$\\begin{bmatrix}3\\\\-2\\end{bmatrix}$',
+                        '$\\begin{bmatrix}1\\\\4\\end{bmatrix}$',
+                        '$\\begin{bmatrix}3\\\\1\\end{bmatrix}$',
+                        '$\\begin{bmatrix}-2\\\\4\\end{bmatrix}$'
+                    ],
+                    correct: 0,
+                    hints: [
+                        'When you multiply a matrix by $\\mathbf{e}_1 = [1,0]^T$, the result is always the first column.',
+                        'Column 1 of the matrix is $[3, -2]^T$.',
+                        'In general, $A\\mathbf{e}_k$ = the $k$-th column of $A$. That\'s why the columns of a transformation matrix have geometric meaning!'
+                    ],
+                    solution: '<p>A beautiful fact: multiplying by a standard basis vector $\\mathbf{e}_k$ simply extracts column $k$:</p><div class="step">$A\\mathbf{e}_1 = \\text{column 1 of }A = \\begin{bmatrix}3\\\\-2\\end{bmatrix}$</div><p>This is <em>why</em> we build transformation matrices by tracking where the basis vectors go — the columns literally are the destinations of $\\mathbf{e}_1$ and $\\mathbf{e}_2$.</p>'
+                },
+                {
+                    skill: '3.2 — Linearity Property',
+                    question: '$T$ is a linear transformation with $T(\\mathbf{u}) = \\begin{bmatrix}1\\\\2\\end{bmatrix}$ and $T(\\mathbf{v}) = \\begin{bmatrix}3\\\\0\\end{bmatrix}$. What is $T(\\mathbf{u} + \\mathbf{v})$?',
+                    answers: [
+                        '$\\begin{bmatrix}4\\\\2\\end{bmatrix}$',
+                        '$\\begin{bmatrix}3\\\\2\\end{bmatrix}$',
+                        '$\\begin{bmatrix}1\\\\6\\end{bmatrix}$',
+                        'Cannot determine'
+                    ],
+                    correct: 0,
+                    hints: [
+                        'Linear transformations preserve addition: $T(\\mathbf{u} + \\mathbf{v}) = T(\\mathbf{u}) + T(\\mathbf{v})$.',
+                        '$T(\\mathbf{u}) + T(\\mathbf{v}) = [1,2]^T + [3,0]^T = ?$',
+                        '$= [4, 2]^T$.'
+                    ],
+                    solution: '<p>The defining property of a <strong>linear transformation</strong> is that it preserves addition and scalar multiplication:</p><div class="step">$T(\\mathbf{u} + \\mathbf{v}) = T(\\mathbf{u}) + T(\\mathbf{v})$</div><div class="step">$= \\begin{bmatrix}1\\\\2\\end{bmatrix} + \\begin{bmatrix}3\\\\0\\end{bmatrix} = \\begin{bmatrix}4\\\\2\\end{bmatrix}$</div>'
+                },
+                {
+                    skill: '3.2 — Scaling Property',
+                    question: '$T$ is a linear transformation with $T(\\mathbf{v}) = \\begin{bmatrix}6\\\\-4\\end{bmatrix}$. What is $T(3\\mathbf{v})$?',
+                    answers: [
+                        '$\\begin{bmatrix}18\\\\-12\\end{bmatrix}$',
+                        '$\\begin{bmatrix}6\\\\-4\\end{bmatrix}$',
+                        '$\\begin{bmatrix}9\\\\-7\\end{bmatrix}$',
+                        '$\\begin{bmatrix}2\\\\-4/3\\end{bmatrix}$'
+                    ],
+                    correct: 0,
+                    hints: [
+                        'Linear transformations preserve scalar multiplication: $T(c\\mathbf{v}) = cT(\\mathbf{v})$.',
+                        '$T(3\\mathbf{v}) = 3 \\cdot T(\\mathbf{v}) = 3 \\begin{bmatrix}6\\\\-4\\end{bmatrix}$.',
+                        '$= \\begin{bmatrix}18\\\\-12\\end{bmatrix}$.'
+                    ],
+                    solution: '<p>By the <strong>homogeneity</strong> property of linear transformations:</p><div class="step">$T(3\\mathbf{v}) = 3 \\cdot T(\\mathbf{v}) = 3 \\begin{bmatrix}6\\\\-4\\end{bmatrix} = \\begin{bmatrix}18\\\\-12\\end{bmatrix}$</div><p>Linear transformations "commute" with scalar multiplication — scaling the input by 3 is the same as scaling the output by 3.</p>'
+                },
+                {
+                    skill: '3.2 — Domain and Range',
+                    question: '$A$ is a $4 \\times 6$ matrix. The transformation $T(\\mathbf{x}) = A\\mathbf{x}$ maps from:',
+                    answers: [
+                        '$\\mathbb{R}^4$ to $\\mathbb{R}^6$',
+                        '$\\mathbb{R}^6$ to $\\mathbb{R}^4$',
+                        '$\\mathbb{R}^6$ to $\\mathbb{R}^6$',
+                        '$\\mathbb{R}^4$ to $\\mathbb{R}^4$'
+                    ],
+                    correct: 1,
+                    hints: [
+                        'The input $\\mathbf{x}$ must match the number of columns (to make the product $A\\mathbf{x}$ defined).',
+                        '$A$ has 6 columns → input is in $\\mathbb{R}^6$.',
+                        '$A$ has 4 rows → output has 4 entries → output is in $\\mathbb{R}^4$.'
+                    ],
+                    solution: '<p>For $T(\\mathbf{x}) = A\\mathbf{x}$ with $A$ being $m \\times n$:</p><div class="step"><strong>Domain:</strong> $\\mathbb{R}^n$ (columns) → $\\mathbb{R}^6$</div><div class="step"><strong>Codomain:</strong> $\\mathbb{R}^m$ (rows) → $\\mathbb{R}^4$</div><p>Think: "columns eat the input, rows shape the output." The map goes $\\mathbb{R}^6 \\to \\mathbb{R}^4$.</p>'
+                },
+
+                // ───── 3.3 Matrix of a Transformation ─────
+                {
+                    skill: '3.3 — Build Matrix from Basis Images',
+                    question: 'A linear transformation sends $\\begin{bmatrix}1\\\\0\\end{bmatrix} \\to \\begin{bmatrix}2\\\\5\\end{bmatrix}$ and $\\begin{bmatrix}0\\\\1\\end{bmatrix} \\to \\begin{bmatrix}-1\\\\3\\end{bmatrix}$. What is its matrix?',
+                    answers: [
+                        '$\\begin{bmatrix}2&-1\\\\5&3\\end{bmatrix}$',
+                        '$\\begin{bmatrix}2&5\\\\-1&3\\end{bmatrix}$',
+                        '$\\begin{bmatrix}1&0\\\\0&1\\end{bmatrix}$',
+                        '$\\begin{bmatrix}5&3\\\\2&-1\\end{bmatrix}$'
+                    ],
+                    correct: 0,
+                    hints: [
+                        'The matrix of a linear transformation has the images of the basis vectors as its <strong>columns</strong>.',
+                        'Column 1 = where $\\mathbf{e}_1$ lands = $[2, 5]^T$. Column 2 = where $\\mathbf{e}_2$ lands = $[-1, 3]^T$.',
+                        'So $A = \\begin{bmatrix}2&-1\\\\5&3\\end{bmatrix}$.'
+                    ],
+                    solution: '<p>The fundamental recipe for building a transformation matrix:</p><div class="step"><strong>Column 1</strong> = $T(\\mathbf{e}_1) = \\begin{bmatrix}2\\\\5\\end{bmatrix}$</div><div class="step"><strong>Column 2</strong> = $T(\\mathbf{e}_2) = \\begin{bmatrix}-1\\\\3\\end{bmatrix}$</div><div class="step">$A = \\begin{bmatrix}2&-1\\\\5&3\\end{bmatrix}$</div><p>This works because $A\\mathbf{e}_k$ = column $k$ of $A$, so the columns literally <em>are</em> the destinations of the basis vectors.</p>'
+                },
+                {
+                    skill: '3.3 — Rotation Matrix',
+                    question: 'What is the matrix for counterclockwise rotation by $180°$?',
+                    answers: [
+                        '$\\begin{bmatrix}-1&0\\\\0&-1\\end{bmatrix}$',
+                        '$\\begin{bmatrix}1&0\\\\0&1\\end{bmatrix}$',
+                        '$\\begin{bmatrix}0&-1\\\\1&0\\end{bmatrix}$',
+                        '$\\begin{bmatrix}0&1\\\\-1&0\\end{bmatrix}$'
+                    ],
+                    correct: 0,
+                    hints: [
+                        'Use the rotation matrix formula: $R(\\theta) = \\begin{bmatrix}\\cos\\theta & -\\sin\\theta \\\\ \\sin\\theta & \\cos\\theta\\end{bmatrix}$.',
+                        '$\\cos(180°) = -1$ and $\\sin(180°) = 0$.',
+                        '$R(180°) = \\begin{bmatrix}-1&0\\\\0&-1\\end{bmatrix}$. This sends every vector to its negative — it\'s a half-turn!'
+                    ],
+                    solution: '<p>Using the rotation formula with $\\theta = 180°$:</p><div class="step">$\\cos(180°) = -1, \\quad \\sin(180°) = 0$</div><div class="step">$R(180°) = \\begin{bmatrix}-1&0\\\\0&-1\\end{bmatrix}$</div><p>Geometrically, this sends every point $(x, y)$ to $(-x, -y)$ — a rotation through half a circle, or equivalently, $-I$, which negates every vector.</p>'
+                },
+                {
+                    skill: '3.3 — Reflection Matrix',
+                    question: 'What is the matrix for reflection across the $y$-axis?',
+                    answers: [
+                        '$\\begin{bmatrix}-1&0\\\\0&1\\end{bmatrix}$',
+                        '$\\begin{bmatrix}1&0\\\\0&-1\\end{bmatrix}$',
+                        '$\\begin{bmatrix}0&1\\\\1&0\\end{bmatrix}$',
+                        '$\\begin{bmatrix}0&-1\\\\-1&0\\end{bmatrix}$'
+                    ],
+                    correct: 0,
+                    hints: [
+                        'Think about where the basis vectors go under this reflection.',
+                        '$\\mathbf{e}_1 = [1,0]^T$ (on the $x$-axis) reflects to $[-1,0]^T$ (flips across $y$-axis).',
+                        '$\\mathbf{e}_2 = [0,1]^T$ (on the $y$-axis) stays put: $[0,1]^T$. Columns: $[-1, 0]^T$ and $[0, 1]^T$.'
+                    ],
+                    solution: '<p>Track the basis vectors under reflection across the $y$-axis:</p><div class="step">$\\mathbf{e}_1 = \\begin{bmatrix}1\\\\0\\end{bmatrix} \\to \\begin{bmatrix}-1\\\\0\\end{bmatrix}$ (flips the $x$-component)</div><div class="step">$\\mathbf{e}_2 = \\begin{bmatrix}0\\\\1\\end{bmatrix} \\to \\begin{bmatrix}0\\\\1\\end{bmatrix}$ (stays fixed — it\'s on the mirror line)</div><div class="step">$A = \\begin{bmatrix}-1&0\\\\0&1\\end{bmatrix}$</div>'
+                },
+                {
+                    skill: '3.3 — Composition',
+                    question: 'First rotate $90°$ counterclockwise ($R = \\begin{bmatrix}0&-1\\\\1&0\\end{bmatrix}$), then reflect across the $x$-axis ($F = \\begin{bmatrix}1&0\\\\0&-1\\end{bmatrix}$). What is the matrix for the combined transformation?',
+                    answers: [
+                        '$\\begin{bmatrix}0&-1\\\\-1&0\\end{bmatrix}$',
+                        '$\\begin{bmatrix}0&1\\\\1&0\\end{bmatrix}$',
+                        '$\\begin{bmatrix}0&-1\\\\1&0\\end{bmatrix}$',
+                        '$\\begin{bmatrix}1&0\\\\0&-1\\end{bmatrix}$'
+                    ],
+                    correct: 0,
+                    hints: [
+                        'When we apply $R$ first, then $F$, the combined matrix is $FR$ (second transformation\'s matrix goes on the <em>left</em>).',
+                        'Compute $FR$: Row 1 of $F$ dotted with columns of $R$.',
+                        '$FR = \\begin{bmatrix}1&0\\\\0&-1\\end{bmatrix}\\begin{bmatrix}0&-1\\\\1&0\\end{bmatrix} = \\begin{bmatrix}0&-1\\\\-1&0\\end{bmatrix}$'
+                    ],
+                    solution: '<p>Composition means the <strong>second</strong> transformation\'s matrix multiplies on the <strong>left</strong>:</p><div class="step">Combined $= FR = \\begin{bmatrix}1&0\\\\0&-1\\end{bmatrix}\\begin{bmatrix}0&-1\\\\1&0\\end{bmatrix}$</div><div class="step">Entry $(1,1)$: $1(0) + 0(1) = 0$</div><div class="step">Entry $(1,2)$: $1(-1) + 0(0) = -1$</div><div class="step">Entry $(2,1)$: $0(0) + (-1)(1) = -1$</div><div class="step">Entry $(2,2)$: $0(-1) + (-1)(0) = 0$</div><div class="step">$FR = \\begin{bmatrix}0&-1\\\\-1&0\\end{bmatrix}$</div><p>This is actually a reflection across the line $y = -x$!</p>'
+                }
+            ]
+        });
+    </script>
+</body>
+
+</html>

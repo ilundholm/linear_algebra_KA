@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Section 1.2 Quiz — Unit 1</title>
+    <link rel="stylesheet" href="../exercise-style.css">
+    <script>window.MathJax = { tex: { inlineMath: [['$', '$']], displayMath: [['$$', '$$']] } };</script>
+    <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml.js" async></script>
+</head>
+
+<body>
+    <div id="exercise-app"></div>
+    <script src="question-bank.js"></script>
+    <script src="../exercise-engine.js"></script>
+    <script>
+        const engine = new ExerciseEngine({
+            unitTitle: 'Systems of Linear Equations',
+            unitNumber: '1',
+            modeLabel: 'Quiz: Section 1.2',
+            backUrl: '../../index.html',
+            landingUrl: 'index.html',
+            sampleSize: 5,
+            questions: getSection('1.2')
+        });
+    </script>
+</body>
+
+</html>
