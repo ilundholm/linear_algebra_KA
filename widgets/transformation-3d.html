@@ -173,10 +173,10 @@
                         <div class="dot" style="background:#e94560"></div> e₁ (x-axis) → Column 1
                     </div>
                     <div class="legend-item">
-                        <div class="dot" style="background:#4d80e4"></div> e₂ (y-axis) → Column 2
+                        <div class="dot" style="background:#16c79a"></div> e₂ (y-axis) → Column 2
                     </div>
                     <div class="legend-item">
-                        <div class="dot" style="background:#16c79a"></div> e₃ (z-axis) → Column 3
+                        <div class="dot" style="background:#4d80e4"></div> e₃ (z-axis) → Column 3
                     </div>
                 </div>
             </div>
@@ -298,11 +298,11 @@
 
         // e2 arrow
         const dir2 = new THREE.Vector3(0, 1, 0);
-        const arrow2 = new THREE.ArrowHelper(dir2, origin, 1, 0x4d80e4);
+        const arrow2 = new THREE.ArrowHelper(dir2, origin, 1, 0x16c79a);
 
         // e3 arrow
         const dir3 = new THREE.Vector3(0, 0, 1);
-        const arrow3 = new THREE.ArrowHelper(dir3, origin, 1, 0x16c79a);
+        const arrow3 = new THREE.ArrowHelper(dir3, origin, 1, 0x4d80e4);
 
         // Make arrows thicker/visible
         arrow1.line.material.linewidth = 3;
