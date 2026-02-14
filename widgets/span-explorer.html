@@ -7,17 +7,17 @@
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/mathbox@2.3.1/build/mathbox.css">
   <style>
     * { box-sizing: border-box; }
-    body { margin: 0; background: #1a1a2e; font-family: 'Segoe UI', sans-serif; color: #eee; }
+    body { margin: 0; background: #ffffff; font-family: 'Segoe UI', sans-serif; color: #0f172a; }
     .container { display: flex; width: 100%; height: 500px; }
-    .sidebar { width: 260px; min-width: 260px; background: #12121c; padding: 20px 15px; display: flex; flex-direction: column; gap: 12px; overflow-y: auto; }
+    .sidebar { width: 260px; min-width: 260px; background: #f8fafc; border-right: 1px solid #e2e8f0; padding: 20px 15px; display: flex; flex-direction: column; gap: 12px; overflow-y: auto; }
     #mathbox { flex: 1; height: 100%; }
-    .vector-section { background: rgba(255,255,255,0.05); border-radius: 8px; padding: 12px; }
+    .vector-section { background: #ffffff; border: 1px solid #e2e8f0; box-shadow: 0 1px 2px rgba(0,0,0,0.05); border-radius: 8px; padding: 12px; }
     .vector-section h3 { margin: 0 0 8px 0; font-size: 14px; }
     .vector-badge { display: inline-block; padding: 3px 10px; border-radius: 4px; font-weight: bold; font-size: 12px; }
     .v1-badge { background: #e94560; }
     .v2-badge { background: #4d80e4; }
     .slider-row { display: flex; align-items: center; margin: 6px 0; gap: 8px; }
-    .slider-row label { width: 20px; font-size: 13px; color: #aaa; }
+    .slider-row label { width: 20px; font-size: 13px; color: #64748b; }
     .slider-row input[type="range"] { flex: 1; }
     .slider-row .value { width: 40px; text-align: right; font-size: 13px; font-family: monospace; }
     .vector-display { display: flex; align-items: center; justify-content: center; gap: 8px; font-size: 14px; margin-top: 6px; }
@@ -67,20 +67,20 @@ const mathbox = MathBox.mathBox({
   controls: { klass: THREE.OrbitControls },
   camera: { fov: 45 },
 });
-mathbox.three.renderer.setClearColor(new THREE.Color('#1a1a2e'), 1.0);
+mathbox.three.renderer.setClearColor(new THREE.Color('#ffffff'), 1.0);
 mathbox.camera({ proxy: true, position: [0, 0, 6] });
 
 const view = mathbox.cartesian({ range: [[-4, 4], [-4, 4], [-1, 1]], scale: [2, 2, 1] });
-view.grid({ axes: [1, 2], width: 1, color: '#444', depth: 0.5 });
-view.axis({ axis: 1, width: 3, color: '#ffffff' });
-view.axis({ axis: 2, width: 3, color: '#ffffff' });
+view.grid({ axes: [1, 2], width: 1, color: '#e2e8f0', depth: 0.5 });
+view.axis({ axis: 1, width: 3, color: '#0f172a' });
+view.axis({ axis: 2, width: 3, color: '#0f172a' });
 
 view.array({ id: 'xlabels', width: 6, channels: 3, data: [[-3,-0.5,0],[-2,-0.5,0],[-1,-0.5,0],[1,-0.5,0],[2,-0.5,0],[3,-0.5,0]] });
 view.text({ data: ['-3','-2','-1','1','2','3'] });
-view.label({ points: '#xlabels', color: '#ffffff', background: '#1a1a2e', size: 16, depth: 0.5 });
+view.label({ points: '#xlabels', color: '#0f172a', background: '#ffffff', size: 16, depth: 0.5 });
 view.array({ id: 'ylabels', width: 6, channels: 3, data: [[-0.5,-3,0],[-0.5,-2,0],[-0.5,-1,0],[-0.5,1,0],[-0.5,2,0],[-0.5,3,0]] });
 view.text({ data: ['-3','-2','-1','1','2','3'] });
-view.label({ points: '#ylabels', color: '#ffffff', background: '#1a1a2e', size: 16, depth: 0.5 });
+view.label({ points: '#ylabels', color: '#0f172a', background: '#ffffff', size: 16, depth: 0.5 });
 
 // v1
 view.array({ id: 'v1pts', width: 2, channels: 3, data: [[0,0,0], [v1[0],v1[1],0]] });

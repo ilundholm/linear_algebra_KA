@@ -9,9 +9,9 @@
     * { box-sizing: border-box; }
     body {
       margin: 0;
-      background: #1a1a2e;
+      background: #ffffff;
       font-family: 'Segoe UI', sans-serif;
-      color: #eee;
+      color: #0f172a;
     }
     
     .container {
@@ -23,7 +23,7 @@
     .sidebar {
       width: 260px;
       min-width: 260px;
-      background: #12121c;
+      background: #f8fafc; border-right: 1px solid #e2e8f0;
       padding: 20px 15px;
       display: flex;
       flex-direction: column;
@@ -36,7 +36,7 @@
     }
     
     .vector-section {
-      background: rgba(255,255,255,0.05);
+      background: #ffffff; border: 1px solid #e2e8f0; box-shadow: 0 1px 2px rgba(0,0,0,0.05);
       border-radius: 8px;
       padding: 12px;
     }
@@ -70,7 +70,7 @@
     .slider-row label {
       width: 25px;
       font-size: 14px;
-      color: #aaa;
+      color: #64748b;
     }
     
     .slider-row input[type="range"] {
@@ -191,7 +191,7 @@ const mathbox = MathBox.mathBox({
   },
 });
 
-mathbox.three.renderer.setClearColor(new THREE.Color('#1a1a2e'), 1.0);
+mathbox.three.renderer.setClearColor(new THREE.Color('#ffffff'), 1.0);
 
 mathbox.camera({
   proxy: true,
@@ -208,13 +208,13 @@ const view = mathbox
 view.grid({
   axes: [1, 2],
   width: 1,
-  color: '#444',
+  color: '#e2e8f0',
   depth: 0.5,
 });
 
 // Axes (white)
-view.axis({ axis: 1, width: 3, color: '#ffffff' });
-view.axis({ axis: 2, width: 3, color: '#ffffff' });
+view.axis({ axis: 1, width: 3, color: '#0f172a' });
+view.axis({ axis: 2, width: 3, color: '#0f172a' });
 
 // X-axis labels
 view.array({
@@ -228,8 +228,8 @@ view.text({
 });
 view.label({
   points: '#xlabels',
-  color: '#ffffff',
-  background: '#1a1a2e',
+  color: '#0f172a',
+  background: '#ffffff',
   size: 16,
   depth: 0.5,
 });
@@ -246,8 +246,8 @@ view.text({
 });
 view.label({
   points: '#ylabels',
-  color: '#ffffff',
-  background: '#1a1a2e',
+  color: '#0f172a',
+  background: '#ffffff',
   size: 16,
   depth: 0.5,
 });

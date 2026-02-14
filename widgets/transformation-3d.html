@@ -12,9 +12,9 @@
 
         body {
             margin: 0;
-            background: #1a1a2e;
+            background: #ffffff;
             font-family: 'Segoe UI', sans-serif;
-            color: #eee;
+            color: #0f172a;
             overflow: hidden;
         }
 
@@ -27,7 +27,7 @@
         .sidebar {
             width: 300px;
             min-width: 300px;
-            background: #12121c;
+            background: #f8fafc; border-right: 1px solid #e2e8f0;
             padding: 20px 15px;
             display: flex;
             flex-direction: column;
@@ -51,7 +51,7 @@
         h3 {
             margin: 0 0 10px 0;
             font-size: 14px;
-            color: #aaa;
+            color: #64748b;
             text-transform: uppercase;
             letter-spacing: 0.05em;
         }
@@ -81,8 +81,8 @@
             width: 50px;
             padding: 6px 4px;
             text-align: center;
-            background: #2a2a4a;
-            border: 1px solid #444;
+            background: #ffffff; color: #0f172a;
+            border: 1px solid #cbd5e1;
             color: #fff;
             border-radius: 4px;
             font-size: 14px;
@@ -101,8 +101,8 @@
 
         .preset-btn {
             padding: 8px;
-            background: #2a2a4a;
-            border: 1px solid #444;
+            background: #ffffff; color: #0f172a;
+            border: 1px solid #cbd5e1;
             color: #ddd;
             border-radius: 4px;
             cursor: pointer;
@@ -225,7 +225,7 @@
         // Scene setup
         const container = document.getElementById('canvas-container');
         const scene = new THREE.Scene();
-        scene.background = new THREE.Color('#1a1a2e');
+        scene.background = new THREE.Color('#ffffff');
 
         const camera = new THREE.PerspectiveCamera(45, container.clientWidth / container.clientHeight, 0.1, 100);
         camera.position.set(4, 3, 5);

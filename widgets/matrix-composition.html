@@ -7,22 +7,22 @@
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/mathbox@2.3.1/build/mathbox.css">
   <style>
     * { box-sizing: border-box; }
-    body { margin: 0; background: #1a1a2e; font-family: 'Segoe UI', sans-serif; color: #eee; }
+    body { margin: 0; background: #ffffff; font-family: 'Segoe UI', sans-serif; color: #0f172a; }
     .container { display: flex; width: 100%; height: 500px; }
-    .sidebar { width: 300px; min-width: 300px; background: #12121c; padding: 15px; display: flex; flex-direction: column; gap: 10px; overflow-y: auto; }
+    .sidebar { width: 300px; min-width: 300px; background: #f8fafc; border-right: 1px solid #e2e8f0; padding: 15px; display: flex; flex-direction: column; gap: 10px; overflow-y: auto; }
     #mathbox { flex: 1; height: 100%; }
-    .section { background: rgba(255,255,255,0.05); border-radius: 8px; padding: 10px; }
-    .section h3 { margin: 0 0 8px 0; font-size: 13px; color: #aaa; }
+    .section { background: #ffffff; border: 1px solid #e2e8f0; box-shadow: 0 1px 2px rgba(0,0,0,0.05); border-radius: 8px; padding: 10px; }
+    .section h3 { margin: 0 0 8px 0; font-size: 13px; color: #64748b; }
     .matrix-row { display: flex; align-items: center; justify-content: center; gap: 5px; margin: 5px 0; }
     .matrix-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 4px; }
-    .matrix-grid input { width: 40px; padding: 4px; text-align: center; background: #2a2a4a; border: 1px solid #444; color: #fff; border-radius: 4px; font-size: 12px; }
+    .matrix-grid input { width: 40px; padding: 4px; text-align: center; background: #ffffff; color: #0f172a; border: 1px solid #cbd5e1; color: #fff; border-radius: 4px; font-size: 12px; }
     .bracket { font-size: 30px; font-weight: 100; }
     .equals { font-size: 20px; margin: 0 8px; }
     .result-matrix { display: inline-grid; grid-template-columns: 1fr 1fr; gap: 4px 10px; font-family: monospace; font-size: 14px; }
     .a-color { color: #e94560; }
     .b-color { color: #4d80e4; }
     .ab-color { color: #16c79a; }
-    .preset-btn { padding: 6px 10px; margin: 2px; background: #2a2a4a; border: none; color: #fff; border-radius: 4px; cursor: pointer; font-size: 11px; }
+    .preset-btn { padding: 6px 10px; margin: 2px; background: #ffffff; color: #0f172a; border: none; color: #fff; border-radius: 4px; cursor: pointer; font-size: 11px; }
     .preset-btn:hover { background: #3a3a5a; }
     .info { font-size: 11px; color: #888; text-align: center; }
   </style>
@@ -103,7 +103,7 @@ const mathbox = MathBox.mathBox({
   controls: { klass: THREE.OrbitControls },
   camera: { fov: 45 },
 });
-mathbox.three.renderer.setClearColor(new THREE.Color('#1a1a2e'), 1.0);
+mathbox.three.renderer.setClearColor(new THREE.Color('#ffffff'), 1.0);
 mathbox.camera({ proxy: true, position: [0, 0, 6] });
 
 const view = mathbox.cartesian({ range: [[-4, 4], [-4, 4], [-1, 1]], scale: [2, 2, 1] });

@@ -6,17 +6,17 @@
   <title>Three Planes Intersection</title>
   <style>
     * { box-sizing: border-box; }
-    body { margin: 0; background: #1a1a2e; font-family: 'Segoe UI', sans-serif; color: #eee; }
+    body { margin: 0; background: #ffffff; font-family: 'Segoe UI', sans-serif; color: #0f172a; }
     .container { display: flex; width: 100%; height: 500px; }
-    .sidebar { width: 280px; min-width: 280px; background: #12121c; padding: 15px; display: flex; flex-direction: column; gap: 10px; overflow-y: auto; }
+    .sidebar { width: 280px; min-width: 280px; background: #f8fafc; border-right: 1px solid #e2e8f0; padding: 15px; display: flex; flex-direction: column; gap: 10px; overflow-y: auto; }
     #canvas-container { flex: 1; height: 100%; position: relative; }
     canvas { display: block; }
-    .section { background: rgba(255,255,255,0.05); border-radius: 8px; padding: 10px; }
+    .section { background: #ffffff; border: 1px solid #e2e8f0; box-shadow: 0 1px 2px rgba(0,0,0,0.05); border-radius: 8px; padding: 10px; }
     .section h3 { margin: 0 0 8px 0; font-size: 13px; }
     .p1 { color: #e94560; }
     .p2 { color: #4d80e4; }
     .p3 { color: #16c79a; }
-    .preset-btn { width: 100%; padding: 10px; margin: 4px 0; background: #2a2a4a; border: none; color: #fff; border-radius: 6px; cursor: pointer; font-size: 12px; text-align: left; }
+    .preset-btn { width: 100%; padding: 10px; margin: 4px 0; background: #ffffff; color: #0f172a; border: none; color: #fff; border-radius: 6px; cursor: pointer; font-size: 12px; text-align: left; }
     .preset-btn:hover { background: #3a3a5a; }
     .preset-btn.active { background: #4d80e4; }
     .result { text-align: center; padding: 12px; border-radius: 8px; font-size: 14px; margin-top: auto; }
@@ -64,7 +64,7 @@ const height = container.clientHeight;
 
 // Scene setup
 const scene = new THREE.Scene();
-scene.background = new THREE.Color('#1a1a2e');
+scene.background = new THREE.Color('#ffffff');
 
 const camera = new THREE.PerspectiveCamera(45, width / height, 0.1, 100);
 camera.position.set(4, 3, 5);
