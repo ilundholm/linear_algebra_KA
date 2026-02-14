@@ -1,0 +1,347 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Row Reduction: Staircase Pattern</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            background: #1a1a2e;
+            font-family: 'Segoe UI', system-ui, sans-serif;
+            color: #eee;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 16px;
+        }
+
+        .widget {
+            max-width: 640px;
+            width: 100%;
+            background: rgba(255, 255, 255, 0.03);
+            border-radius: 12px;
+            padding: 24px;
+            border: 1px solid rgba(255, 255, 255, 0.06);
+        }
+
+        h2 {
+            color: #16c79a;
+            font-size: 18px;
+            text-align: center;
+            margin-bottom: 16px;
+        }
+
+        /* Progress dots */
+        .progress {
+            display: flex;
+            gap: 6px;
+            justify-content: center;
+            margin-bottom: 20px;
+        }
+
+        .dot {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            background: #333;
+            cursor: pointer;
+            transition: all .25s;
+        }
+
+        .dot.done {
+            background: #4d80e4;
+        }
+
+        .dot.active {
+            background: #16c79a;
+            transform: scale(1.3);
+        }
+
+        /* Matrix display */
+        .matrix-wrap {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 4px;
+            margin: 16px 0;
+        }
+
+        .bracket {
+            font-size: 80px;
+            font-weight: 100;
+            line-height: 1;
+            color: #888;
+            user-select: none;
+        }
+
+        .matrix-grid {
+            display: inline-grid;
+            grid-template-columns: repeat(4, 48px);
+            gap: 5px;
+        }
+
+        .cell {
+            text-align: center;
+            font-family: 'Courier New', monospace;
+            font-size: 18px;
+            padding: 8px 4px;
+            border-radius: 4px;
+            background: rgba(255, 255, 255, 0.04);
+            transition: background .35s, color .35s;
+        }
+
+        /* Augmented separator — right border on column 3 (0-indexed col 2) */
+        .cell.aug-sep {
+            border-right: 2px solid #555;
+            border-radius: 4px 0 0 4px;
+        }
+
+        .cell.pivot {
+            background: #16c79a;
+            color: #000;
+            font-weight: bold;
+        }
+
+        .cell.changed {
+            background: rgba(233, 69, 96, 0.5);
+        }
+
+        .cell.zero-new {
+            background: rgba(77, 128, 228, 0.35);
+        }
+
+        /* Step info */
+        .step-info {
+            background: rgba(255, 255, 255, 0.04);
+            border-radius: 8px;
+            padding: 14px 16px;
+            margin: 16px 0;
+            text-align: center;
+        }
+
+        .step-label {
+            color: #f39c12;
+            font-weight: 600;
+            font-size: 14px;
+        }
+
+        .operation {
+            color: #16c79a;
+            font-family: monospace;
+            font-size: 15px;
+            margin-top: 6px;
+        }
+
+        .rationale {
+            color: #b0b0b0;
+            font-size: 13px;
+            margin-top: 8px;
+            font-style: italic;
+            line-height: 1.4;
+        }
+
+        /* Controls */
+        .controls {
+            display: flex;
+            gap: 8px;
+            justify-content: center;
+            margin-top: 16px;
+        }
+
+        .btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 6px;
+            font-size: 13px;
+            cursor: pointer;
+            color: #fff;
+            transition: background .2s;
+        }
+
+        .btn-nav {
+            background: #4d80e4;
+        }
+
+        .btn-nav:hover {
+            background: #3a6bc7;
+        }
+
+        .btn-nav:disabled {
+            background: #333;
+            cursor: not-allowed;
+        }
+
+        .btn-play {
+            background: #16c79a;
+            min-width: 90px;
+        }
+
+        .btn-play:hover {
+            background: #12a882;
+        }
+
+        .btn-play.paused {
+            background: #e94560;
+        }
+
+        /* Speed */
+        .speed {
+            text-align: center;
+            margin-top: 10px;
+            color: #666;
+            font-size: 12px;
+        }
+
+        .speed select {
+            background: #2a2a4a;
+            color: #ccc;
+            border: 1px solid #444;
+            border-radius: 4px;
+            padding: 2px 6px;
+            font-size: 12px;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="widget">
+        <h2>Row Reduction: Staircase Pattern</h2>
+        <div class="progress" id="progress"></div>
+        <div class="matrix-wrap">
+            <span class="bracket">[</span>
+            <div class="matrix-grid" id="matrix"></div>
+            <span class="bracket">]</span>
+        </div>
+        <div class="step-info">
+            <div class="step-label"><span id="stepNum">Step 0</span> of <span id="totalSteps">0</span></div>
+            <div class="operation" id="operation"></div>
+            <div class="rationale" id="rationale"></div>
+        </div>
+        <div class="controls">
+            <button class="btn btn-nav" id="prevBtn">← Prev</button>
+            <button class="btn btn-play" id="playBtn">▶ Play</button>
+            <button class="btn btn-nav" id="nextBtn">Next →</button>
+        </div>
+        <div class="speed">
+            Delay: <select id="speedSel">
+                <option value="4000">Slow (4s)</option>
+                <option value="2500" selected>Normal (2.5s)</option>
+                <option value="1500">Fast (1.5s)</option>
+            </select>
+        </div>
+    </div>
+
+    <script>
+        // System: x + 2y + z = 4 | 2x + 5y + z = 7 | 3x + 6y + 4z = 15
+        // Matches the RowReductionStaircase Manim scene
+        const steps = [
+            {
+                matrix: [[1, 2, 1, 4], [2, 5, 1, 7], [3, 6, 4, 15]],
+                operation: "Starting augmented matrix",
+                rationale: "We write the system of equations as an augmented matrix, separating coefficients from constants.",
+                changed: [], pivots: [], zeros: []
+            },
+            {
+                matrix: [[1, 2, 1, 4], [0, 1, -1, -1], [3, 6, 4, 15]],
+                operation: "R₂ ← R₂ − 2R₁",
+                rationale: "Goal: create a zero below the first pivot. We subtract 2 × Row 1 from Row 2 to eliminate the 2.",
+                changed: [4, 5, 6, 7], pivots: [0], zeros: [4]
+            },
+            {
+                matrix: [[1, 2, 1, 4], [0, 1, -1, -1], [0, 0, 1, 3]],
+                operation: "R₃ ← R₃ − 3R₁",
+                rationale: "Goal: create zeros below the first pivot in all rows. Subtract 3 × Row 1 from Row 3.",
+                changed: [8, 9, 10, 11], pivots: [0, 5], zeros: [4, 8, 9]
+            },
+            {
+                matrix: [[1, 2, 1, 4], [0, 1, -1, -1], [0, 0, 1, 3]],
+                operation: "REF achieved — staircase!",
+                rationale: "The matrix is now in Row Echelon Form. Notice the staircase of pivots: each row's leading entry is further right than the one above.",
+                changed: [], pivots: [0, 5, 10], zeros: [4, 8, 9]
+            },
+            {
+                matrix: [[1, 2, 0, 1], [0, 1, 0, 2], [0, 0, 1, 3]],
+                operation: "R₁ ← R₁ − R₃, R₂ ← R₂ + R₃",
+                rationale: "Goal: eliminate above the third pivot. Back-substitution makes each pivot the only nonzero in its column.",
+                changed: [2, 3, 6, 7], pivots: [0, 5, 10], zeros: [2, 4, 6, 8, 9]
+            },
+            {
+                matrix: [[1, 0, 0, 1], [0, 1, 0, 2], [0, 0, 1, 3]],
+                operation: "R₁ ← R₁ − 2R₂  →  RREF!",
+                rationale: "Final step: eliminate above the second pivot. Now every pivot is 1, and each pivot column has all other entries = 0. Read the solution: x = 1, y = 2, z = 3.",
+                changed: [1, 3], pivots: [0, 5, 10], zeros: [1, 2, 4, 6, 8, 9]
+            }
+        ];
+
+        let cur = 0, timer = null;
+
+        function render() {
+            const s = steps[cur], grid = document.getElementById('matrix');
+            grid.innerHTML = '';
+            s.matrix.forEach((row, i) => {
+                row.forEach((val, j) => {
+                    const idx = i * 4 + j, cell = document.createElement('div');
+                    cell.className = 'cell';
+                    if (j === 2) cell.classList.add('aug-sep');          // augmented separator
+                    if (s.pivots.includes(idx)) cell.classList.add('pivot');
+                    else if (s.changed.includes(idx)) cell.classList.add('changed');
+                    else if (s.zeros.includes(idx) && val === 0) cell.classList.add('zero-new');
+                    cell.textContent = val;
+                    grid.appendChild(cell);
+                });
+            });
+            document.getElementById('stepNum').textContent = `Step ${cur}`;
+            document.getElementById('operation').textContent = s.operation;
+            document.getElementById('rationale').textContent = s.rationale;
+            document.getElementById('prevBtn').disabled = cur === 0;
+            document.getElementById('nextBtn').disabled = cur === steps.length - 1;
+            renderDots();
+        }
+
+        function renderDots() {
+            const p = document.getElementById('progress');
+            p.innerHTML = '';
+            steps.forEach((_, i) => {
+                const d = document.createElement('div');
+                d.className = 'dot' + (i < cur ? ' done' : '') + (i === cur ? ' active' : '');
+                d.onclick = () => { cur = i; render(); };
+                p.appendChild(d);
+            });
+        }
+
+        function togglePlay() {
+            if (timer) { clearInterval(timer); timer = null; updatePlayBtn(); return; }
+            if (cur >= steps.length - 1) cur = 0;
+            const ms = +document.getElementById('speedSel').value;
+            timer = setInterval(() => {
+                if (cur < steps.length - 1) { cur++; render(); }
+                else { clearInterval(timer); timer = null; updatePlayBtn(); }
+            }, ms);
+            updatePlayBtn();
+        }
+
+        function updatePlayBtn() {
+            const b = document.getElementById('playBtn');
+            b.textContent = timer ? '⏸ Pause' : '▶ Play';
+            b.classList.toggle('paused', !!timer);
+        }
+
+        document.getElementById('prevBtn').onclick = () => { if (cur > 0) { cur--; render(); } };
+        document.getElementById('nextBtn').onclick = () => { if (cur < steps.length - 1) { cur++; render(); } };
+        document.getElementById('playBtn').onclick = togglePlay;
+        document.getElementById('speedSel').onchange = () => { if (timer) { clearInterval(timer); timer = null; togglePlay(); } };
+        document.getElementById('totalSteps').textContent = steps.length - 1;
+
+        render();
+    </script>
+</body>
+
+</html>
