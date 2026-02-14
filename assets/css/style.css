@@ -238,6 +238,34 @@ th {
     margin-left: -0.5rem;
 }
 
+/* Sub-links for Exercises/Quizzes */
+.sidebar-sublink {
+    font-size: 0.85em;
+    padding-left: 1rem !important;
+    color: var(--color-text-muted) !important;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.sidebar-sublink:hover {
+    color: var(--color-accent) !important;
+}
+
+.sidebar-sublink::before {
+    content: "↳";
+    font-size: 1.1em;
+    opacity: 0.5;
+}
+
+.sidebar-sublink.current {
+    color: var(--color-accent) !important;
+    font-weight: 600;
+    border-left: 2px solid var(--color-accent);
+    margin-left: -0.5rem;
+    padding-left: 1.5rem !important;
+}
+
 /* Main Content Card */
 .content-card {
     background: var(--color-surface);

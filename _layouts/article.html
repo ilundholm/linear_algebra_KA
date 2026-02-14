@@ -10,31 +10,85 @@ layout: default
         <aside class="sidebar">
             <nav class="sidebar-nav">
 
+
                 <h3>Unit 1: Linear Systems</h3>
+                
+                <!-- 1.1 -->
                 <a href="{{ '/articles/unit1/1.1-introduction-to-linear-systems.html' | relative_url }}"
                     class="{% if page.url contains '1.1' %}current{% endif %}">1.1 Intro to Linear Systems</a>
+                <a href="{{ '/exercises/unit1/skill-verify-solutions.html' | relative_url }}" class="sidebar-sublink">Skill: Verify Solutions</a>
+                <a href="{{ '/exercises/unit1/skill-classify-systems.html' | relative_url }}" class="sidebar-sublink">Skill: Classify Systems</a>
+                <a href="{{ '/exercises/unit1/quiz-1-1.html' | relative_url }}" class="sidebar-sublink">📝 Quiz 1.1</a>
+
+                <!-- 1.2 -->
                 <a href="{{ '/articles/unit1/1.2-augmented-matrices-and-row-reduction.html' | relative_url }}"
                     class="{% if page.url contains '1.2' %}current{% endif %}">1.2 Row Reduction</a>
+                <a href="{{ '/exercises/unit1/skill-augmented-matrices.html' | relative_url }}" class="sidebar-sublink">Skill: Augmented Matrices</a>
+                <a href="{{ '/exercises/unit1/skill-row-operations.html' | relative_url }}" class="sidebar-sublink">Skill: Row Operations</a>
+                <a href="{{ '/exercises/unit1/skill-ref-rref.html' | relative_url }}" class="sidebar-sublink">Skill: REF & RREF</a>
+                <a href="{{ '/exercises/unit1/quiz-1-2.html' | relative_url }}" class="sidebar-sublink">📝 Quiz 1.2</a>
+
+                <!-- 1.3 -->
                 <a href="{{ '/articles/unit1/1.3-interpreting-solutions.html' | relative_url }}"
                     class="{% if page.url contains '1.3' %}current{% endif %}">1.3 Interpreting Solutions</a>
+                <a href="{{ '/exercises/unit1/skill-pivot-free-variables.html' | relative_url }}" class="sidebar-sublink">Skill: Pivot & Free Vars</a>
+                <a href="{{ '/exercises/unit1/skill-consistency.html' | relative_url }}" class="sidebar-sublink">Skill: Consistency</a>
+                <a href="{{ '/exercises/unit1/quiz-1-3.html' | relative_url }}" class="sidebar-sublink">📝 Quiz 1.3</a>
+
+                <!-- 1.4 -->
                 <a href="{{ '/articles/unit1/1.4-applications.html' | relative_url }}"
                     class="{% if page.url contains '1.4' %}current{% endif %}">1.4 Applications</a>
+                <a href="{{ '/exercises/unit1/skill-applications.html' | relative_url }}" class="sidebar-sublink">Skill: Applications</a>
+                
+                <hr style="margin: 1rem 0; border: 0; border-top: 1px solid var(--color-border);">
 
                 <h3>Unit 2: Vectors</h3>
+
+                <!-- 2.1 -->
                 <a href="{{ '/articles/unit2/2.1-vectors-in-rn.html' | relative_url }}"
                     class="{% if page.url contains '2.1' %}current{% endif %}">2.1 Vectors in ℝⁿ</a>
+                <a href="{{ '/exercises/unit2/skill-vector-arithmetic.html' | relative_url }}" class="sidebar-sublink">Skill: Vector Arithmetic</a>
+                <a href="{{ '/exercises/unit2/skill-vector-equations.html' | relative_url }}" class="sidebar-sublink">Skill: Vector Equations</a>
+                <a href="{{ '/exercises/unit2/quiz-2-1.html' | relative_url }}" class="sidebar-sublink">📝 Quiz 2.1</a>
+
+                <!-- 2.2 -->
                 <a href="{{ '/articles/unit2/2.2-linear-combinations-and-span.html' | relative_url }}"
                     class="{% if page.url contains '2.2' %}current{% endif %}">2.2 Linear Combinations</a>
+                <a href="{{ '/exercises/unit2/skill-linear-combinations.html' | relative_url }}" class="sidebar-sublink">Skill: Linear Combinations</a>
+                <a href="{{ '/exercises/unit2/skill-span.html' | relative_url }}" class="sidebar-sublink">Skill: Span</a>
+                <a href="{{ '/exercises/unit2/quiz-2-2.html' | relative_url }}" class="sidebar-sublink">📝 Quiz 2.2</a>
+
+                <!-- 2.3 -->
                 <a href="{{ '/articles/unit2/2.3-linear-independence.html' | relative_url }}"
                     class="{% if page.url contains '2.3' %}current{% endif %}">2.3 Linear Independence</a>
+                <a href="{{ '/exercises/unit2/skill-linear-independence.html' | relative_url }}" class="sidebar-sublink">Skill: Linear Independence</a>
+                <a href="{{ '/exercises/unit2/skill-dependence-relations.html' | relative_url }}" class="sidebar-sublink">Skill: Dependence Relations</a>
+                <a href="{{ '/exercises/unit2/quiz-2-3.html' | relative_url }}" class="sidebar-sublink">📝 Quiz 2.3</a>
+
+                <hr style="margin: 1rem 0; border: 0; border-top: 1px solid var(--color-border);">
 
                 <h3>Unit 3: Matrices</h3>
+
+                <!-- 3.1 -->
                 <a href="{{ '/articles/unit3/3.1-matrix-vector-multiplication.html' | relative_url }}"
                     class="{% if page.url contains '3.1' %}current{% endif %}">3.1 Matrix-Vector Mult</a>
+                <a href="{{ '/exercises/unit3/skill-matrix-vector-products.html' | relative_url }}" class="sidebar-sublink">Skill: Matrix-Vector Prods</a>
+                <a href="{{ '/exercises/unit3/skill-dimensions-compatibility.html' | relative_url }}" class="sidebar-sublink">Skill: Dimensions</a>
+                <a href="{{ '/exercises/unit3/quiz-3-1.html' | relative_url }}" class="sidebar-sublink">📝 Quiz 3.1</a>
+
+                <!-- 3.2 -->
                 <a href="{{ '/articles/unit3/3.2-linear-transformations.html' | relative_url }}"
                     class="{% if page.url contains '3.2' %}current{% endif %}">3.2 Linear Transformations</a>
+                <a href="{{ '/exercises/unit3/skill-transformation-identification.html' | relative_url }}" class="sidebar-sublink">Skill: Identify Transforms</a>
+                <a href="{{ '/exercises/unit3/skill-properties-transformations.html' | relative_url }}" class="sidebar-sublink">Skill: Properties</a>
+                <a href="{{ '/exercises/unit3/quiz-3-2.html' | relative_url }}" class="sidebar-sublink">📝 Quiz 3.2</a>
+
+                <!-- 3.3 -->
                 <a href="{{ '/articles/unit3/3.3-matrix-of-transformation.html' | relative_url }}"
                     class="{% if page.url contains '3.3' %}current{% endif %}">3.3 Matrix of Transform</a>
+                <a href="{{ '/exercises/unit3/skill-build-transformation-matrices.html' | relative_url }}" class="sidebar-sublink">Skill: Build Matrices</a>
+                <a href="{{ '/exercises/unit3/skill-standard-matrices.html' | relative_url }}" class="sidebar-sublink">Skill: Standard Matrices</a>
+                <a href="{{ '/exercises/unit3/quiz-3-3.html' | relative_url }}" class="sidebar-sublink">📝 Quiz 3.3</a>
 
             </nav>
         </aside>
