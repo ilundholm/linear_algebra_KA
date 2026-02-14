@@ -223,6 +223,23 @@ li {
     padding: 3rem;
     box-shadow: var(--shadow-sm);
     min-height: 80vh;
+    min-width: 0;
+    /* Prevent grid blowout */
+    overflow-wrap: break-word;
+    /* Ensure long text wraps */
+}
+
+/* Fluid Media */
+img,
+video,
+iframe {
+    max-width: 100%;
+    height: auto;
+}
+
+iframe {
+    width: 100%;
+    /* Ensure iframes take full width but not more */
 }
 
 /* Components */
@@ -274,6 +291,10 @@ pre {
     border-radius: var(--radius-md);
     overflow-x: auto;
     font-family: 'Fira Code', monospace;
+    max-width: 100%;
+    /* Prevent code blocks from pushing width */
+    white-space: pre-wrap;
+    /* Wrap code if necessary, or use scroll */
 }
 
 pre code {
@@ -334,11 +355,43 @@ summary:hover {
     flex-direction: column;
 }
 
-.unit-card:hover {
-    transform: translateY(-4px);
-    box-shadow: var(--shadow-md);
-    border-color: var(--color-accent);
-    text-decoration: none;
+transform: translateY(-4px);
+box-shadow: var(--shadow-md);
+border-color: var(--color-accent);
+}
+
+.unit-links {
+    list-style: none;
+    padding: 0;
+    margin-top: 1.5rem;
+    border-top: 1px solid var(--color-border);
+    padding-top: 1rem;
+}
+
+.unit-links li {
+    margin-bottom: 0.6rem;
+    padding-left: 1.25rem;
+    position: relative;
+}
+
+.unit-links li::before {
+    content: "→";
+    /* or specific icon */
+    color: var(--color-accent);
+    position: absolute;
+    left: 0;
+    font-weight: bold;
+    font-size: 0.9em;
+}
+
+.unit-links a {
+    color: var(--color-text);
+    font-weight: 500;
+}
+
+.unit-links a:hover {
+    color: var(--color-accent);
+    text-decoration: underline;
 }
 
 .unit-card h3 {

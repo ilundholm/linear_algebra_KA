@@ -23,31 +23,44 @@ title: Home
     <div class="unit-grid">
       
       <!-- Unit 1 -->
-      <a href="{{ '/articles/unit1/1.1-introduction-to-linear-systems.html' | relative_url }}" class="unit-card">
+      <div class="unit-card">
         <h3>Unit 1: Linear Systems</h3>
         <p class="unit-desc">
           Understand systems of equations as geometric intersections of lines and planes. Master <strong>row reduction</strong> and the <strong>row picture</strong>.
         </p>
-        <div class="unit-link">Start Unit 1 →</div>
-      </a>
+        <ul class="unit-links">
+          <li><a href="{{ '/articles/unit1/1.1-introduction-to-linear-systems.html' | relative_url }}">1.1 Intro to Linear Systems</a></li>
+          <li><a href="{{ '/articles/unit1/1.2-augmented-matrices-and-row-reduction.html' | relative_url }}">1.2 Row Reduction</a></li>
+          <li><a href="{{ '/articles/unit1/1.3-interpreting-solutions.html' | relative_url }}">1.3 Interpreting Solutions</a></li>
+          <li><a href="{{ '/articles/unit1/1.4-applications.html' | relative_url }}">1.4 Applications</a></li>
+        </ul>
+      </div>
       
       <!-- Unit 2 -->
-      <a href="{{ '/articles/unit2/2.1-vectors-in-rn.html' | relative_url }}" class="unit-card">
+      <div class="unit-card">
         <h3>Unit 2: Vectors & Linear Combinations</h3>
         <p class="unit-desc">
            Enter the world of vectors. Learn about <strong>span</strong>, <strong>linear independence</strong>, and the crucial <strong>column picture</strong> ($A\mathbf{x} = \mathbf{b}$).
         </p>
-        <div class="unit-link">Start Unit 2 →</div>
-      </a>
+        <ul class="unit-links">
+          <li><a href="{{ '/articles/unit2/2.1-vectors-in-rn.html' | relative_url }}">2.1 Vectors in ℝⁿ</a></li>
+          <li><a href="{{ '/articles/unit2/2.2-linear-combinations-and-span.html' | relative_url }}">2.2 Linear Combinations</a></li>
+          <li><a href="{{ '/articles/unit2/2.3-linear-independence.html' | relative_url }}">2.3 Linear Independence</a></li>
+        </ul>
+      </div>
       
       <!-- Unit 3 -->
-      <a href="{{ '/articles/unit3/3.1-matrix-vector-multiplication.html' | relative_url }}" class="unit-card">
+      <div class="unit-card">
         <h3>Unit 3: Matrices & Transformations</h3>
         <p class="unit-desc">
           See matrices as functions that warp space. Explore linear transformations, rotations, scalings, and the <strong>transformation picture</strong>.
         </p>
-        <div class="unit-link">Start Unit 3 →</div>
-      </a>
+         <ul class="unit-links">
+          <li><a href="{{ '/articles/unit3/3.1-matrix-vector-multiplication.html' | relative_url }}">3.1 Matrix-Vector Multiplication</a></li>
+          <li><a href="{{ '/articles/unit3/3.2-linear-transformations.html' | relative_url }}">3.2 Linear Transformations</a></li>
+          <li><a href="{{ '/articles/unit3/3.3-matrix-of-transformation.html' | relative_url }}">3.3 Matrix of Transformation</a></li>
+        </ul>
+      </div>
       
     </div>
   </div>
