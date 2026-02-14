@@ -564,3 +564,154 @@ class ReflectionAcrossYEqualsX(Scene):
                  e1, e1_lab, e1_r, e1_r_lab, arc1,
                  e2, e2_lab, e2_r, e2_r_lab, arc2,
                  mat, title)
+
+
+# ════════════════════════════════════════════════════════════════════════════
+# 11. Article 1.4 — Traffic Flow Network
+# ════════════════════════════════════════════════════════════════════════════
+class TrafficFlowNetwork(Scene):
+    def construct(self):
+        self.camera.background_color = BG
+
+        title = Text("Traffic Flow Network", font_size=28,
+                      color=LABEL_C).to_edge(UP, buff=0.4)
+
+        # Nodes
+        def node_circle(label, color=BLUE_A):
+            c = Circle(radius=0.4, color=color, fill_color=color,
+                       fill_opacity=0.15, stroke_width=2)
+            t = Text(label, font_size=24, color=color)
+            t.move_to(c)
+            return VGroup(c, t)
+
+        A = node_circle("A", BLUE_A).move_to(UP * 1.5)
+        B = node_circle("B", RED_A).move_to(DOWN * 1 + LEFT * 2.5)
+        C = node_circle("C", GREEN_A).move_to(DOWN * 1 + RIGHT * 2.5)
+
+        # External flows (in)
+        in_top = Arrow(UP * 3, A.get_top(), buff=0.1, color=YELLOW_A, stroke_width=3)
+        in_top_lab = Text("400", font_size=22, color=YELLOW_A).next_to(in_top, RIGHT, buff=0.1)
+
+        in_left = Arrow(LEFT * 4.5 + DOWN * 1, B.get_left(), buff=0.1, color=YELLOW_A, stroke_width=3)
+        in_left_lab = Text("500", font_size=22, color=YELLOW_A).next_to(in_left, DOWN, buff=0.1)
+
+        # External flows (out)
+        out_right = Arrow(C.get_right(), RIGHT * 4.5 + DOWN * 1, buff=0.1, color=YELLOW_A, stroke_width=3)
+        out_right_lab = Text("600", font_size=22, color=YELLOW_A).next_to(out_right, DOWN, buff=0.1)
+
+        out_bottom = Arrow(B.get_bottom(), DOWN * 3 + LEFT * 2.5, buff=0.1, color=YELLOW_A, stroke_width=3)
+        out_bottom_lab = Text("300", font_size=22, color=YELLOW_A).next_to(out_bottom, RIGHT, buff=0.1)
+
+        # Internal flows
+        arr_ab = Arrow(A.get_bottom() + LEFT * 0.2, B.get_top() + RIGHT * 0.2,
+                       buff=0.1, color=LABEL_C, stroke_width=2.5)
+        lab_ab = MathTex("x_1", font_size=26, color=LABEL_C).next_to(arr_ab, LEFT, buff=0.1)
+
+        arr_ac = Arrow(A.get_bottom() + RIGHT * 0.2, C.get_top() + LEFT * 0.2,
+                       buff=0.1, color=LABEL_C, stroke_width=2.5)
+        lab_ac = MathTex("x_2", font_size=26, color=LABEL_C).next_to(arr_ac, RIGHT, buff=0.1)
+
+        arr_bc = Arrow(B.get_right(), C.get_left(), buff=0.1,
+                       color=LABEL_C, stroke_width=2.5)
+        lab_bc = MathTex("x_3", font_size=26, color=LABEL_C).next_to(arr_bc, DOWN, buff=0.1)
+
+        # Conservation equations
+        eqs = VGroup(
+            MathTex(r"\text{A: } 400 = x_1 + x_2", font_size=22, color=BLUE_A),
+            MathTex(r"\text{B: } 500 + x_1 = x_3 + 300", font_size=22, color=RED_A),
+            MathTex(r"\text{C: } x_2 + x_3 = 600", font_size=22, color=GREEN_A),
+        ).arrange(DOWN, aligned_edge=LEFT, buff=0.15).to_corner(DR, buff=0.5)
+
+        eq_title = Text("Flow in = Flow out", font_size=18,
+                        color=FAINT).next_to(eqs, UP, buff=0.15)
+
+        self.add(title, A, B, C,
+                 in_top, in_top_lab, in_left, in_left_lab,
+                 out_right, out_right_lab, out_bottom, out_bottom_lab,
+                 arr_ab, lab_ab, arr_ac, lab_ac, arr_bc, lab_bc,
+                 eqs, eq_title)
+
+
+# ════════════════════════════════════════════════════════════════════════════
+# 12. Article 3.1 — Matrix Dimension Matching
+# ════════════════════════════════════════════════════════════════════════════
+class DimensionMatching(Scene):
+    def construct(self):
+        self.camera.background_color = BG
+
+        title = Text("Matrix × Vector: Dimensions Must Match",
+                      font_size=26, color=LABEL_C).to_edge(UP, buff=0.4)
+
+        # ── Valid multiplication ──
+        valid_title = Text("✓  Valid", font_size=22, color=GREEN_A)
+
+        a_box = RoundedRectangle(corner_radius=0.1, width=2.2, height=1.6,
+                                  color=BLUE_A, fill_color=BLUE_A,
+                                  fill_opacity=0.1, stroke_width=2)
+        a_label = MathTex("A", font_size=28, color=BLUE_A).move_to(a_box)
+        a_dim = MathTex(r"m \times n", font_size=20, color=BLUE_A).next_to(a_box, DOWN, buff=0.08)
+
+        x_box = RoundedRectangle(corner_radius=0.1, width=0.8, height=1.6,
+                                  color=YELLOW_A, fill_color=YELLOW_A,
+                                  fill_opacity=0.1, stroke_width=2)
+        x_label = MathTex(r"\mathbf{x}", font_size=28, color=YELLOW_A).move_to(x_box)
+        x_dim = MathTex(r"n \times 1", font_size=20, color=YELLOW_A).next_to(x_box, DOWN, buff=0.08)
+
+        eq_sign = MathTex("=", font_size=30, color=LABEL_C)
+
+        b_box = RoundedRectangle(corner_radius=0.1, width=0.8, height=1.6,
+                                  color=GREEN_A, fill_color=GREEN_A,
+                                  fill_opacity=0.1, stroke_width=2)
+        b_label = MathTex(r"A\mathbf{x}", font_size=24, color=GREEN_A).move_to(b_box)
+        b_dim = MathTex(r"m \times 1", font_size=20, color=GREEN_A).next_to(b_box, DOWN, buff=0.08)
+
+        valid_group = VGroup(a_box, x_box, eq_sign, b_box)
+        a_box.next_to(ORIGIN, LEFT, buff=0.15)
+        x_box.next_to(a_box, RIGHT, buff=0.15)
+        eq_sign.next_to(x_box, RIGHT, buff=0.3)
+        b_box.next_to(eq_sign, RIGHT, buff=0.3)
+
+        # Match brace
+        match_brace = BraceBetweenPoints(
+            a_dim.get_right() + RIGHT * 0.05,
+            x_dim.get_left() + LEFT * 0.05,
+            direction=DOWN, color=GREEN_A
+        )
+        match_text = Text("must match!", font_size=16, color=GREEN_A).next_to(match_brace, DOWN, buff=0.05)
+
+        all_valid = VGroup(valid_group, a_label, a_dim, x_label, x_dim,
+                           eq_sign, b_label, b_dim, match_brace, match_text,
+                           valid_title)
+        valid_title.next_to(valid_group, UP, buff=0.3)
+        all_valid.shift(UP * 0.3)
+
+        # ── Invalid example ──
+        invalid_title = Text("✗  Invalid", font_size=22, color=RED_A)
+
+        bad_a = RoundedRectangle(corner_radius=0.1, width=2.2, height=1,
+                                  color=BLUE_A, fill_color=BLUE_A,
+                                  fill_opacity=0.1, stroke_width=2)
+        bad_a_lab = MathTex(r"2 \times 3", font_size=20, color=BLUE_A).move_to(bad_a)
+
+        bad_x = RoundedRectangle(corner_radius=0.1, width=0.8, height=0.8,
+                                  color=RED_A, fill_color=RED_A,
+                                  fill_opacity=0.1, stroke_width=2)
+        bad_x_lab = MathTex(r"2 \times 1", font_size=20, color=RED_A).move_to(bad_x)
+
+        bad_eq = MathTex(r"= \text{ undefined!}", font_size=22, color=RED_A)
+
+        bad_group = VGroup(bad_a, bad_x, bad_eq).arrange(RIGHT, buff=0.2)
+        invalid_title.next_to(bad_group, UP, buff=0.15)
+
+        bad_brace = BraceBetweenPoints(
+            bad_a.get_bottom() + RIGHT * 0.9,
+            bad_x.get_bottom() + LEFT * 0.3,
+            direction=DOWN, color=RED_A
+        )
+        bad_text = MathTex(r"3 \neq 2", font_size=18, color=RED_A).next_to(bad_brace, DOWN, buff=0.05)
+
+        all_invalid = VGroup(bad_group, invalid_title, bad_a_lab, bad_x_lab,
+                             bad_brace, bad_text)
+        all_invalid.next_to(all_valid, DOWN, buff=0.7)
+
+        self.add(title, all_valid, all_invalid)
