@@ -254,8 +254,7 @@ th {
 
 /* Fluid Media */
 img,
-video,
-iframe {
+video {
     max-width: 100%;
     height: auto;
 }
