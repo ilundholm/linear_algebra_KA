@@ -3,60 +3,70 @@ layout: default
 title: Home
 ---
 
-# Linear Algebra: A Modern Perspective
+<div class="container" style="text-align: center; padding-top: 4rem; padding-bottom: 4rem;">
+  <h1 style="font-size: 3.5rem; margin-bottom: 1.5rem; color: var(--color-primary);">Linear Algebra: Intuition First</h1>
+  <p style="font-size: 1.25rem; color: var(--color-text-muted); max-width: 700px; margin: 0 auto 3rem auto;">
+    A comprehensive, visual curriculum emphasizing geometric intuition over rote memorization.
+    Explore vectors, matrices, and transformations through interactive widgets and 3Blue1Brown-style animations.
+  </p>
+  
+  <div style="display: flex; gap: 1rem; justify-content: center; margin-bottom: 4rem;">
+    <a href="#unit-1" style="background: var(--color-accent); color: white; padding: 0.75rem 1.5rem; border-radius: var(--radius-sm); font-weight: 600;">Start Learning</a>
+    <a href="https://github.com/ilundholm/linear_algebra_KA" style="background: #fff; border: 1px solid var(--color-border); color: var(--color-text); padding: 0.75rem 1.5rem; border-radius: var(--radius-sm); font-weight: 600;">View on GitHub</a>
+  </div>
+</div>
 
-A comprehensive, intuition-first curriculum for Linear Algebra.
+<div class="container" id="unit-1">
+  <div class="unit-section">
+    <h2 style="border-bottom: none; text-align: center; margin-bottom: 2rem;">Course Units</h2>
+    
+    <div class="unit-grid">
+      
+      <!-- Unit 1 -->
+      <a href="{{ '/articles/unit1/1.1-introduction-to-linear-systems.html' | relative_url }}" class="unit-card">
+        <h3>Unit 1: Linear Systems</h3>
+        <p class="unit-desc">
+          Understand systems of equations as geometric intersections of lines and planes. Master <strong>row reduction</strong> and the <strong>row picture</strong>.
+        </p>
+        <div class="unit-link">Start Unit 1 →</div>
+      </a>
+      
+      <!-- Unit 2 -->
+      <a href="{{ '/articles/unit2/2.1-vectors-in-rn.html' | relative_url }}" class="unit-card">
+        <h3>Unit 2: Vectors & Linear Combinations</h3>
+        <p class="unit-desc">
+           Enter the world of vectors. Learn about <strong>span</strong>, <strong>linear independence</strong>, and the crucial <strong>column picture</strong> ($A\mathbf{x} = \mathbf{b}$).
+        </p>
+        <div class="unit-link">Start Unit 2 →</div>
+      </a>
+      
+      <!-- Unit 3 -->
+      <a href="{{ '/articles/unit3/3.1-matrix-vector-multiplication.html' | relative_url }}" class="unit-card">
+        <h3>Unit 3: Matrices & Transformations</h3>
+        <p class="unit-desc">
+          See matrices as functions that warp space. Explore linear transformations, rotations, scalings, and the <strong>transformation picture</strong>.
+        </p>
+        <div class="unit-link">Start Unit 3 →</div>
+      </a>
+      
+    </div>
+  </div>
+</div>
 
----
-
-## About This Project
-
-This is an expansion of Khan Academy's Linear Algebra course, emphasizing:
-
-- **Intuition before formalism** — visualize first, symbolize second
-- **Three perspectives** on every concept: row picture, column picture, transformation picture
-- **Interleaved practice** — exercises embedded throughout, not just at the end
-- **Real applications** — curve fitting, chemistry, traffic flow, and more
-
----
-
-## Course Units
-
-### Unit 1: Systems of Linear Equations
-- [1.1 Introduction to Linear Systems](articles/unit1/1.1-introduction-to-linear-systems.html)
-- [1.2 Augmented Matrices and Row Reduction](articles/unit1/1.2-augmented-matrices-and-row-reduction.html)
-- [1.3 Interpreting Solutions](articles/unit1/1.3-interpreting-solutions.html)
-- [1.4 Applications](articles/unit1/1.4-applications.html)
-
-### Unit 2: Vectors and Linear Combinations
-- [2.1 Vectors in ℝⁿ](articles/unit2/2.1-vectors-in-rn.html)
-- [2.2 Linear Combinations and Span](articles/unit2/2.2-linear-combinations-and-span.html)
-- [2.3 Linear Independence](articles/unit2/2.3-linear-independence.html)
-
-### Unit 3: Matrix-Vector Multiplication & Transformations
-- [3.1 Matrix-Vector Multiplication](articles/unit3/3.1-matrix-vector-multiplication.html)
-- [3.2 Linear Transformations](articles/unit3/3.2-linear-transformations.html)
-- [3.3 The Matrix of a Transformation](articles/unit3/3.3-matrix-of-transformation.html)
-
----
-
-## The Three Perspectives
-
-Our approach emphasizes three complementary views of the equation $A\mathbf{x} = \mathbf{b}$:
-
-1. **The Row Picture:** Each equation is a geometric constraint (line, plane, hyperplane). Solutions are intersections.
-
-2. **The Column Picture:** $A\mathbf{x}$ is a linear combination of the columns of $A$. "Can we reach $\mathbf{b}$?"
-
-3. **The Transformation Picture:** $A$ is a function that warps space. "What input $\mathbf{x}$ maps to output $\mathbf{b}$?"
-
----
-
-## Contributors
-
-- **Ian** — Lead architect, pedagogy, quality control
-- **Phillip** — Content generation, project support
-
----
-
-*This is an independent project. Not affiliated with Khan Academy.*
+<div class="container" style="background: #f1f5f9; border-radius: var(--radius-md); padding: 3rem; margin-top: 4rem; text-align: center;">
+  <h3>Why This Approach?</h3>
+  <div class="unit-grid" style="grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); text-align: left; margin-top: 2rem;">
+    <div class="unit-card" style="border: none; background: transparent; box-shadow: none;">
+      <h4 style="color: var(--color-accent); font-size: 1.1rem;">👁️ Visual First</h4>
+      <p style="font-size: 0.95rem;">We introduce every concept with geometry before algebra. If you can't picture it, we haven't explained it.</p>
+    </div>
+    <div class="unit-card" style="border: none; background: transparent; box-shadow: none;">
+      <h4 style="color: var(--color-accent); font-size: 1.1rem;">🖱️ Interactive</h4>
+      <p style="font-size: 0.95rem;">Don't just read—play. Use interactive widgets to build intuition for row reduction and transformations.</p>
+    </div>
+    <div class="unit-card" style="border: none; background: transparent; box-shadow: none;">
+      <h4 style="color: var(--color-accent); font-size: 1.1rem;">🚀 Applied</h4>
+      <p style="font-size: 0.95rem;">Connect the math to real-world applications like computer graphics, data science, and physics.</p>
+    </div>
+  </div>
+</div>

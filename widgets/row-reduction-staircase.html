@@ -5,7 +5,30 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Row Reduction: Staircase Pattern</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Fira+Code:wght@400;500&display=swap"
+        rel="stylesheet">
     <style>
+        :root {
+            --color-primary: #0f172a;
+            --color-accent: #14b8a6;
+            --color-accent-hover: #0d9488;
+            --color-bg: #ffffff;
+            --color-text: #334155;
+            --color-border: #e2e8f0;
+            --color-pivot: #14b8a6;
+            --color-changed: #fecdd3;
+            /* Soft red bg */
+            --color-changed-text: #881337;
+            --color-zero: #e0f2fe;
+            /* Soft blue bg */
+            --color-zero-text: #0369a1;
+            --font-sans: 'Inter', sans-serif;
+            --font-mono: 'Fira Code', monospace;
+        }
+
         * {
             box-sizing: border-box;
             margin: 0;
@@ -13,9 +36,9 @@
         }
 
         body {
-            background: #1a1a2e;
-            font-family: 'Segoe UI', system-ui, sans-serif;
-            color: #eee;
+            background: var(--color-bg);
+            font-family: var(--font-sans);
+            color: var(--color-text);
             display: flex;
             justify-content: center;
             align-items: center;
@@ -26,15 +49,18 @@
         .widget {
             max-width: 640px;
             width: 100%;
-            background: rgba(255, 255, 255, 0.03);
+            background: #ffffff;
             border-radius: 12px;
             padding: 24px;
-            border: 1px solid rgba(255, 255, 255, 0.06);
+            border: 1px solid var(--color-border);
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+            /* Slight shadow */
         }
 
         h2 {
-            color: #16c79a;
-            font-size: 18px;
+            color: var(--color-primary);
+            font-size: 1.25rem;
+            font-weight: 700;
             text-align: center;
             margin-bottom: 16px;
         }
@@ -42,27 +68,27 @@
         /* Progress dots */
         .progress {
             display: flex;
-            gap: 6px;
+            gap: 8px;
             justify-content: center;
-            margin-bottom: 20px;
+            margin-bottom: 24px;
         }
 
         .dot {
             width: 10px;
             height: 10px;
             border-radius: 50%;
-            background: #333;
+            background: #e2e8f0;
             cursor: pointer;
             transition: all .25s;
         }
 
         .dot.done {
-            background: #4d80e4;
+            background: #94a3b8;
         }
 
         .dot.active {
-            background: #16c79a;
-            transform: scale(1.3);
+            background: var(--color-accent);
+            transform: scale(1.2);
         }
 
         /* Matrix display */
@@ -71,142 +97,161 @@
             align-items: center;
             justify-content: center;
             gap: 4px;
-            margin: 16px 0;
+            margin: 24px 0;
         }
 
         .bracket {
             font-size: 80px;
-            font-weight: 100;
+            font-weight: 300;
             line-height: 1;
-            color: #888;
+            color: #94a3b8;
             user-select: none;
         }
 
         .matrix-grid {
             display: inline-grid;
-            grid-template-columns: repeat(4, 48px);
-            gap: 5px;
+            grid-template-columns: repeat(4, 52px);
+            gap: 6px;
         }
 
         .cell {
             text-align: center;
-            font-family: 'Courier New', monospace;
+            font-family: var(--font-mono);
+            font-weight: 500;
             font-size: 18px;
-            padding: 8px 4px;
-            border-radius: 4px;
-            background: rgba(255, 255, 255, 0.04);
-            transition: background .35s, color .35s;
+            padding: 10px 4px;
+            border-radius: 6px;
+            background: #f8fafc;
+            color: var(--color-text);
+            transition: background .3s, color .3s, transform .2s;
         }
 
-        /* Augmented separator — right border on column 3 (0-indexed col 2) */
+        /* Augmented separator */
         .cell.aug-sep {
-            border-right: 2px solid #555;
-            border-radius: 4px 0 0 4px;
+            border-right: 2px solid #cbd5e1;
+            border-radius: 6px 0 0 6px;
         }
 
         .cell.pivot {
-            background: #16c79a;
-            color: #000;
-            font-weight: bold;
+            background: var(--color-pivot);
+            color: #fff;
+            font-weight: 700;
         }
 
         .cell.changed {
-            background: rgba(233, 69, 96, 0.5);
+            background: var(--color-changed);
+            color: var(--color-changed-text);
         }
 
         .cell.zero-new {
-            background: rgba(77, 128, 228, 0.35);
+            background: var(--color-zero);
+            color: var(--color-zero-text);
         }
 
         /* Step info */
         .step-info {
-            background: rgba(255, 255, 255, 0.04);
+            background: #f8fafc;
             border-radius: 8px;
-            padding: 14px 16px;
-            margin: 16px 0;
+            border: 1px solid var(--color-border);
+            padding: 16px;
+            margin: 24px 0;
             text-align: center;
         }
 
         .step-label {
-            color: #f39c12;
+            color: #64748b;
             font-weight: 600;
-            font-size: 14px;
+            font-size: 0.85rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
         }
 
         .operation {
-            color: #16c79a;
-            font-family: monospace;
-            font-size: 15px;
-            margin-top: 6px;
+            color: var(--color-primary);
+            font-family: var(--font-mono);
+            font-weight: 600;
+            font-size: 1.1rem;
+            margin-top: 8px;
         }
 
         .rationale {
-            color: #b0b0b0;
-            font-size: 13px;
+            color: var(--color-text);
+            font-size: 0.95rem;
             margin-top: 8px;
-            font-style: italic;
-            line-height: 1.4;
+            line-height: 1.5;
         }
 
         /* Controls */
         .controls {
             display: flex;
-            gap: 8px;
+            gap: 12px;
             justify-content: center;
-            margin-top: 16px;
+            margin-top: 24px;
         }
 
         .btn {
             padding: 10px 20px;
-            border: none;
+            border: 1px solid transparent;
             border-radius: 6px;
-            font-size: 13px;
+            font-size: 0.9rem;
+            font-weight: 600;
             cursor: pointer;
-            color: #fff;
-            transition: background .2s;
+            transition: all .2s;
+            font-family: var(--font-sans);
         }
 
         .btn-nav {
-            background: #4d80e4;
+            background: #fff;
+            border-color: var(--color-border);
+            color: var(--color-text);
         }
 
         .btn-nav:hover {
-            background: #3a6bc7;
+            border-color: var(--color-primary);
+            color: var(--color-primary);
+            background: #f8fafc;
         }
 
         .btn-nav:disabled {
-            background: #333;
+            opacity: 0.5;
             cursor: not-allowed;
+            border-color: var(--color-border);
         }
 
         .btn-play {
-            background: #16c79a;
-            min-width: 90px;
+            background: var(--color-accent);
+            color: #fff;
+            min-width: 100px;
+            box-shadow: 0 2px 4px rgba(20, 184, 166, 0.2);
         }
 
         .btn-play:hover {
-            background: #12a882;
+            background: var(--color-accent-hover);
+            transform: translateY(-1px);
         }
 
         .btn-play.paused {
-            background: #e94560;
+            background: #f43f5e;
+            box-shadow: 0 2px 4px rgba(244, 63, 94, 0.2);
         }
 
         /* Speed */
         .speed {
             text-align: center;
-            margin-top: 10px;
-            color: #666;
-            font-size: 12px;
+            margin-top: 16px;
+            color: #64748b;
+            font-size: 0.85rem;
         }
 
         .speed select {
-            background: #2a2a4a;
-            color: #ccc;
-            border: 1px solid #444;
+            background: #fff;
+            color: var(--color-text);
+            border: 1px solid var(--color-border);
             border-radius: 4px;
-            padding: 2px 6px;
-            font-size: 12px;
+            padding: 2px 8px;
+            font-size: 0.85rem;
+            font-family: var(--font-sans);
+            margin-left: 4px;
         }
     </style>
 </head>
@@ -226,22 +271,21 @@
             <div class="rationale" id="rationale"></div>
         </div>
         <div class="controls">
-            <button class="btn btn-nav" id="prevBtn">← Prev</button>
+            <button class="btn btn-nav" id="prevBtn">← Previous</button>
             <button class="btn btn-play" id="playBtn">▶ Play</button>
             <button class="btn btn-nav" id="nextBtn">Next →</button>
         </div>
         <div class="speed">
-            Delay: <select id="speedSel">
-                <option value="4000">Slow (4s)</option>
-                <option value="2500" selected>Normal (2.5s)</option>
-                <option value="1500">Fast (1.5s)</option>
+            Animation Speed: <select id="speedSel">
+                <option value="4000">Slow</option>
+                <option value="2500" selected>Normal</option>
+                <option value="1500">Fast</option>
             </select>
         </div>
     </div>
 
     <script>
         // System: x + 2y + z = 4 | 2x + 5y + z = 7 | 3x + 6y + 4z = 15
-        // Matches the RowReductionStaircase Manim scene
         const steps = [
             {
                 matrix: [[1, 2, 1, 4], [2, 5, 1, 7], [3, 6, 4, 15]],
@@ -290,7 +334,7 @@
                 row.forEach((val, j) => {
                     const idx = i * 4 + j, cell = document.createElement('div');
                     cell.className = 'cell';
-                    if (j === 2) cell.classList.add('aug-sep');          // augmented separator
+                    if (j === 2) cell.classList.add('aug-sep');
                     if (s.pivots.includes(idx)) cell.classList.add('pivot');
                     else if (s.changed.includes(idx)) cell.classList.add('changed');
                     else if (s.zeros.includes(idx) && val === 0) cell.classList.add('zero-new');
@@ -298,7 +342,7 @@
                     grid.appendChild(cell);
                 });
             });
-            document.getElementById('stepNum').textContent = `Step ${cur}`;
+            document.getElementById('stepNum').textContent = `Step ${cur + 1}`; // 1-based step count for friendliness
             document.getElementById('operation').textContent = s.operation;
             document.getElementById('rationale').textContent = s.rationale;
             document.getElementById('prevBtn').disabled = cur === 0;
@@ -338,7 +382,7 @@
         document.getElementById('nextBtn').onclick = () => { if (cur < steps.length - 1) { cur++; render(); } };
         document.getElementById('playBtn').onclick = togglePlay;
         document.getElementById('speedSel').onchange = () => { if (timer) { clearInterval(timer); timer = null; togglePlay(); } };
-        document.getElementById('totalSteps').textContent = steps.length - 1;
+        document.getElementById('totalSteps').textContent = steps.length;
 
         render();
     </script>
