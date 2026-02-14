@@ -618,57 +618,49 @@ class MatVecAsLinearCombo(Scene):
 
 # ════════════════════════════════════════════════════════════════════════════
 # 13. Article 3.2 — 2D transformations on grid
+#     (Uses plain Scene + NumberPlane for fast rendering)
 # ════════════════════════════════════════════════════════════════════════════
-class TransformationsOnGrid(LinearTransformationScene):
-    def __init__(self, **kwargs):
-        super().__init__(
-            show_coordinates=True,
-            background_plane_kwargs={"stroke_color": FAINT, "stroke_opacity": 0.3},
-            foreground_plane_kwargs={"stroke_color": BLUE_A, "stroke_opacity": 0.5},
-            show_basis_vectors=True,
-            leave_ghost_vectors=False,
-            **kwargs,
-        )
-
+class TransformationsOnGrid(Scene):
     def construct(self):
         self.camera.background_color = BG
 
-        # Scaling
-        title = Text("Scaling", font_size=26, color=LABEL_C).to_corner(UL, buff=0.3)
-        mat = MathTex(r"\begin{bmatrix} 2 & 0 \\ 0 & 1.5 \end{bmatrix}", font_size=24, color=YELLOW_A).next_to(title, DOWN)
-        self.play(Write(title), Write(mat))
-        self.apply_matrix([[2, 0], [0, 1.5]])
-        self.wait(1)
-        self.play(FadeOut(title), FadeOut(mat))
-        self.apply_inverse([[2, 0], [0, 1.5]])
+        transforms = [
+            ("Scaling",          [[2, 0], [0, 1.5]],
+             r"\begin{bmatrix} 2 & 0 \\ 0 & 1.5 \end{bmatrix}"),
+            ("Rotation (45°)",   [[np.cos(np.pi/4), -np.sin(np.pi/4)],
+                                  [np.sin(np.pi/4),  np.cos(np.pi/4)]],
+             r"\begin{bmatrix} \cos 45° & -\sin 45° \\ \sin 45° & \cos 45° \end{bmatrix}"),
+            ("Shear",            [[1, 1], [0, 1]],
+             r"\begin{bmatrix} 1 & 1 \\ 0 & 1 \end{bmatrix}"),
+            ("Reflection (y=x)", [[0, 1], [1, 0]],
+             r"\begin{bmatrix} 0 & 1 \\ 1 & 0 \end{bmatrix}"),
+        ]
 
-        # Rotation 45°
-        title2 = Text("Rotation (45°)", font_size=26, color=LABEL_C).to_corner(UL, buff=0.3)
-        c, s = np.cos(np.pi/4), np.sin(np.pi/4)
-        rot = [[c, -s], [s, c]]
-        mat2 = MathTex(r"\begin{bmatrix} \cos 45° & -\sin 45° \\ \sin 45° & \cos 45° \end{bmatrix}", font_size=20, color=YELLOW_A).next_to(title2, DOWN)
-        self.play(Write(title2), Write(mat2))
-        self.apply_matrix(rot)
-        self.wait(1)
-        self.play(FadeOut(title2), FadeOut(mat2))
-        self.apply_inverse(rot)
+        for name, mat_vals, mat_tex_str in transforms:
+            # Fresh grid + basis vectors per transformation
+            grid = NumberPlane(
+                x_range=[-4, 4, 1], y_range=[-4, 4, 1],
+                x_length=8, y_length=8,
+                background_line_style={"stroke_color": BLUE_A, "stroke_opacity": 0.35, "stroke_width": 1},
+                axis_config={"stroke_color": FAINT},
+            )
+            e1 = Arrow(ORIGIN, RIGHT, buff=0, color=RED_A, stroke_width=5)
+            e2 = Arrow(ORIGIN, UP, buff=0, color=GREEN_A, stroke_width=5)
+            movable = VGroup(grid, e1, e2)
 
-        # Shear
-        title3 = Text("Shear", font_size=26, color=LABEL_C).to_corner(UL, buff=0.3)
-        mat3 = MathTex(r"\begin{bmatrix} 1 & 1 \\ 0 & 1 \end{bmatrix}", font_size=24, color=YELLOW_A).next_to(title3, DOWN)
-        self.play(Write(title3), Write(mat3))
-        self.apply_matrix([[1, 1], [0, 1]])
-        self.wait(1)
-        self.play(FadeOut(title3), FadeOut(mat3))
-        self.apply_inverse([[1, 1], [0, 1]])
+            title = Text(name, font_size=28, color=LABEL_C).to_corner(UL, buff=0.3)
+            mat_label = MathTex(mat_tex_str, font_size=22, color=YELLOW_A).next_to(title, DOWN, aligned_edge=LEFT)
 
-        # Reflection
-        title4 = Text("Reflection (y = x)", font_size=26, color=LABEL_C).to_corner(UL, buff=0.3)
-        mat4 = MathTex(r"\begin{bmatrix} 0 & 1 \\ 1 & 0 \end{bmatrix}", font_size=24, color=YELLOW_A).next_to(title4, DOWN)
-        self.play(Write(title4), Write(mat4))
-        self.apply_matrix([[0, 1], [1, 0]])
-        self.wait(2)
-        self.play(*[FadeOut(m) for m in self.mobjects], run_time=1)
+            self.play(FadeIn(grid), GrowArrow(e1), GrowArrow(e2),
+                      Write(title), Write(mat_label), run_time=1)
+
+            # Apply transform
+            matrix = np.array(mat_vals)
+            self.play(movable.animate.apply_matrix(matrix), run_time=1.5)
+            self.wait(1)
+
+            # Fade out everything before next transform
+            self.play(*[FadeOut(m) for m in self.mobjects], run_time=0.6)
 
 
 # ════════════════════════════════════════════════════════════════════════════
